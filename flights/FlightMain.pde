@@ -102,6 +102,7 @@ void setup() {
 }
 
 boolean showText = true;
+//12/03/2026 Abdul, scroll
 void draw() {
   background(255);
   
