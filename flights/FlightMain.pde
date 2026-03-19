@@ -1,15 +1,16 @@
 Table table;
 ArrayList<Flight> flights = new ArrayList<Flight>();
+
+PFont widgetFont;
 float scrollY = 0;
 float targetScroll = 0;
 float lineHeight = 20;
 float scrollSpeed = 20;
-PFont widgetFont;
 boolean upPressed = false;
 boolean downPressed = false;
 
 void setup() {
-  size(800, 600);
+  size(1200, 800);
   widgetFont = createFont("Arial", 14);
   textFont(widgetFont);
   
@@ -53,12 +54,15 @@ void setup() {
 
 void draw() {
   background(255);
+  
   if (showChart) {
     drawChart();
   }
+  
   if (upPressed) {
     targetScroll += scrollSpeed;  // Scroll up
   }
+  
   if (downPressed) {
     targetScroll -= scrollSpeed;  // Scroll down
   }
@@ -130,7 +134,7 @@ void drawChart() {
 void drawDistanceChart() {
   int numBars = min(19, flights.size());
   float barWidth = (chartWidth - 50) / numBars * 0.7;
-   float gap = 10;
+  float gap = 10;
    
   int maxDistance = 0;
   for (int i = 0; i < numBars; i++) {
