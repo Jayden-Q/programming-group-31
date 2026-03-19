@@ -147,6 +147,8 @@ void draw() {
   text("Total flights: " + flights.size() + " | Showing rows " + (startRow + 1) + " to " + endRow + " of " + flights.size(), 50, 30);
   }
 }
+
+//Charts
 boolean showChart = false;
 int chartX = 100;
 int chartY = 150;
@@ -172,7 +174,6 @@ void drawChart() {
   }
 }
 
-//Chart
 // Draw flights per carrier chart
 void drawCarrierChart() {
   //chart background
