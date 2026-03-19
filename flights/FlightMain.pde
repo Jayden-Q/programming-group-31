@@ -145,7 +145,7 @@ void draw() {
   popMatrix();
   
   //info
-  fill(0);
+  fill(100);
   text("Total flights: " + flights.size() + " | Showing rows " + (startRow + 1) + " to " + endRow + " of " + flights.size(), 50, 30);
   }
 }
