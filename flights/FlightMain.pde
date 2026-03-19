@@ -57,6 +57,7 @@ class Flight {
   }
 }
 
+//12/03/2026 Jayden, setup
 void setup() {
   size(1200, 800);
   widgetFont = createFont("Arial", 14);
