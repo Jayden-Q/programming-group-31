@@ -99,6 +99,7 @@ void setup() {
   println(flights.size() + " flights");
 }
 
+boolean showText = true;
 void draw() {
   background(255);
   
@@ -121,6 +122,7 @@ void draw() {
   scrollY = constrain(scrollY, minScroll, maxScroll);
   targetScroll = constrain(targetScroll, minScroll, maxScroll);
   
+  if(showText){
   // Calculate visible range
   int startRow = max(0, floor((-scrollY) / lineHeight));
   int endRow = min(flights.size(), startRow + ceil(height / lineHeight) + 1);
@@ -140,84 +142,43 @@ void draw() {
   
   popMatrix();
   
-  drawScrollbar();
-  
   //info
   fill(0);
   text("Total flights: " + flights.size() + " | Showing rows " + (startRow + 1) + " to " + endRow + " of " + flights.size(), 50, 30);
+  }
 }
-
 boolean showChart = false;
 int chartX = 100;
 int chartY = 150;
 int chartWidth = 600;
 int chartHeight = 300;
-String chartType = "distance";
+String chartType = "flights";
 
 void drawChart() {
-  //chart background
-  fill(240);
-  stroke(0);
-  rect(chartX, chartY, chartWidth, chartHeight);
-  
   //chart title
   fill(0);
   textAlign(CENTER);
-  if (chartType.equals("distance")) {
-    text("Flight Distances (First 20 flights)", chartX + chartWidth/2, chartY - 10);
-  } else if (chartType.equals("flights")) {
+  if (chartType.equals("flights")) {
     text("Flights per Carrier", chartX + chartWidth/2, chartY - 10);
+  } else if (chartType.equals("")) {
+    text("", chartX + chartWidth/2, chartY - 10);
   }
   textAlign(LEFT);
   
-  if (chartType.equals("distance")) {
-    drawDistanceChart();
-  } else if (chartType.equals("flights")) {
+  if (chartType.equals("flights")) {
     drawCarrierChart();
+  } else if (chartType.equals("")) {
+   
   }
 }
 
 //Chart
-void drawDistanceChart() {
-  int numBars = min(19, flights.size());
-  float barWidth = (chartWidth - 50) / numBars * 0.7;
-  float gap = 10;
-   
-  int maxDistance = 0;
-  for (int i = 0; i < numBars; i++) {
-    Flight f = flights.get(i);
-    if (f.DISTANCE > maxDistance) {
-      maxDistance = f.DISTANCE;
-    }
-  }
-  
-  for (int i = 0; i < numBars; i++) {
-    Flight f = flights.get(i);
-    float barHeight = map(f.DISTANCE, 0, maxDistance, 0, chartHeight - 50);
-    float x = chartX + 25 + i * (barWidth+gap);
-    float y = chartY + chartHeight - 30 - barHeight;
-    
-    fill(100, 150, 255);
-    rect(x, y, barWidth - 2, barHeight);
-    
-    //distance label
-    fill(0);
-    textSize(10);
-    pushMatrix();
-    translate(x + barWidth/2, y - 5);
-    //rotate(radians(45));
-    text(f.DISTANCE, 0, 0);
-    popMatrix();
-  }
-  
-  // Axis labels
-  fill(0);
-  textSize(12);
-  text("Distance (miles)", chartX + chartWidth/2, chartY + chartHeight - 5);
-}
-
 // Draw flights per carrier chart
 void drawCarrierChart() {
+  //chart background
+  fill(240);
+  stroke(0);
+  rect(chartX, chartY, chartWidth, chartHeight);
   // Count flights per carrier
   HashMap<String, Integer> carrierCounts = new HashMap<String, Integer>();
   
@@ -276,15 +237,16 @@ void keyPressed() {
   } else 
     if (key == 'c' || key == 'C') {
       showChart = !showChart;  
-      println("Chart toggled: " + showChart);
+      showText = !showText;
     } else if (key == 'd' || key == 'D') {
-      chartType = "distance";
+      chartType = "";
       showChart = true;
-      println("Showing distance chart");
+     
     } else if (key == 'f' || key == 'F') {
+      if(!showText){
       chartType = "flights";
       showChart = true;
-      println("Showing flights per carrier chart");
+      }
     }
   }
 
@@ -295,18 +257,5 @@ void keyReleased() {
     } else if (keyCode == DOWN) {
       downPressed = false;
     }
-  }
-}
-
-void drawScrollbar() {
-  float totalHeight = flights.size() * lineHeight;
-  float visibleRatio = height / totalHeight;
-  
-  if (visibleRatio < 1) {
-    float barHeight = height * visibleRatio;
-    float barY = map(scrollY, -totalHeight + height, 50, 0, height - barHeight);
-    
-    fill(100, 100, 100, 150);
-    rect(width - 20, barY, 10, barHeight);
   }
 }
