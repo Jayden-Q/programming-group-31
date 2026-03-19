@@ -9,6 +9,7 @@ float scrollSpeed = 20;
 boolean upPressed = false;
 boolean downPressed = false;
 
+//12/03/2026: Xianren, flight class
 class Flight {
   int FL_DATE;
   String MKT_CARRIER;
@@ -148,6 +149,8 @@ void draw() {
   }
 }
 
+//19/03/2026: Xianren, outline and bar chart
+//19/03/2026: Jayden, pie chart
 //Charts
 boolean showChart = false;
 int chartX = 100;
