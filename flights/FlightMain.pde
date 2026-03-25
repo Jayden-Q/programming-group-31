@@ -9,7 +9,130 @@ float scrollSpeed = 20;
 boolean upPressed = false;
 boolean downPressed = false;
 
-//12/03/2026: Xianren, flight class
+// Input objects
+TextInput citySearch;
+
+//Input 
+class Input {
+  String label;
+  String defaultValue;
+  Object value;
+  float x, y;
+  float w, h;
+  boolean isActive = false;
+  boolean isHovered = false;
+  boolean isVisible = true;
+  PFont inputFont;
+  
+  Input(String label, String defaultValue, float x, float y, float w, float h) {
+    this.label = label;
+    this.defaultValue = defaultValue;
+    this.value = defaultValue;
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.inputFont = createFont("Arial", 14);
+  }
+  
+  Object getValue() {
+    return this.value;
+  }
+  
+  void setValue(Object newValue) {
+    this.value = newValue;
+    onChange();
+  }
+  
+  void reset() {
+    this.value = defaultValue;
+    onChange();
+  }
+  
+  void onChange() {
+    // To be overridden 
+  }
+  
+  void update() {
+    this.isHovered = mouseX > this.x && mouseX < this.x + this.w &&
+                    mouseY > this.y && mouseY < this.y + this.h;
+  }
+  
+  void mousePressed() {
+    this.isActive = this.isHovered;
+  }
+  
+  void draw() {
+    if (!this.isVisible) return;
+    
+    textFont(inputFont);
+    
+    // Draw label
+    fill(0);
+    textAlign(LEFT);
+    text(this.label, this.x, this.y - 5);
+    
+    // Draw input background
+    stroke(0);
+    if (this.isActive) {
+      fill(255, 255, 200);
+    } else {
+      fill(255);
+    }
+    rect(this.x, this.y, this.w, this.h);
+    
+    // Draw value text
+    fill(0);
+    textAlign(LEFT);
+    if (this.value != null) {
+      text(this.value.toString(), this.x + 5, this.y + this.h - 7);
+    }
+    
+    textAlign(LEFT);
+  }
+  
+  void keyPressed(char key) {
+    // To be overridden 
+  }
+}
+
+// TextInput 
+class TextInput extends Input {
+  TextInput(String label, String defaultValue, float x, float y, float w, float h) {
+    super(label, defaultValue, x, y, w, h);
+  }
+  
+  @Override
+  void keyPressed(char key) {
+    if (!isActive) return;
+    
+    if (key == BACKSPACE) {
+      String current = (String)this.value;
+      if (current.length() > 0) {
+        this.value = current.substring(0, current.length() - 1);
+        onChange();
+      }
+    } 
+    else if (key == ENTER || key == RETURN) {
+      isActive = false;
+    }
+    else if (key != CODED && key != BACKSPACE && key != ENTER && key != TAB) {
+      this.value = (String)this.value + key;
+      onChange();
+    }
+  }
+  
+  String getText() {
+    return (String)this.value;
+  }
+
+  @Override
+  void onChange() {
+    // redraw when text changes
+  }
+}
+
+// Flight class
 class Flight {
   int FL_DATE;
   String MKT_CARRIER;
@@ -57,7 +180,7 @@ class Flight {
   }
 }
 
-//12/03/2026 Jayden, setup
+// Setup
 void setup() {
   size(1200, 800);
   widgetFont = createFont("Arial", 14);
@@ -98,24 +221,39 @@ void setup() {
     }
   }
   
+  // Create input field
+  citySearch = new TextInput("Search City:", "", 50, 80, 250, 30);
+  
   println(flights.size() + " flights");
 }
 
 boolean showText = true;
-//12/03/2026 Abdul, scroll
+boolean showChart = false;
+int chartX = 100;
+int chartY = 150;
+int chartWidth = 600;
+int chartHeight = 300;
+String chartType = "flights";
+
+// Draw
 void draw() {
   background(255);
   
+  // Update and draw input field
+  citySearch.update();
+  citySearch.draw();
+  
+  // Draw charts
   if (showChart) {
     drawChart();
   }
   
   if (upPressed) {
-    targetScroll += scrollSpeed;  // Scroll up
+    targetScroll += scrollSpeed;
   }
   
   if (downPressed) {
-    targetScroll -= scrollSpeed;  // Scroll down
+    targetScroll -= scrollSpeed;
   }
   
   scrollY += (targetScroll - scrollY) * 0.2;
@@ -125,79 +263,118 @@ void draw() {
   scrollY = constrain(scrollY, minScroll, maxScroll);
   targetScroll = constrain(targetScroll, minScroll, maxScroll);
   
+  // Get filter value
+  String searchCity = citySearch.getText();
+  
   if(showText){
-  // Calculate visible range
-  int startRow = max(0, floor((-scrollY) / lineHeight));
-  int endRow = min(flights.size(), startRow + ceil(height / lineHeight) + 1);
-  
-  // Draw visible flights
-  pushMatrix();
-  translate(0, scrollY);
-  
-  for (int i = startRow; i < endRow; i++) {
-    Flight f = flights.get(i);
-    float y = 50 + i * lineHeight;
+    // Filter flights based on search
+    ArrayList<Flight> filteredFlights = new ArrayList<Flight>();
+    for (Flight f : flights) {
+      boolean matches = true;
+      
+      // City filter (searches both origin and destination)
+      if (!searchCity.equals("")) {
+        if (!f.ORIGIN_CITY_NAME.toLowerCase().contains(searchCity.toLowerCase()) &&
+            !f.DEST_CITY_NAME.toLowerCase().contains(searchCity.toLowerCase())) {
+          matches = false;
+        }
+      }
+      
+      if (matches) {
+        filteredFlights.add(f);
+      }
+    }
     
-    //data
-    fill(0); 
-    text(f.ORIGIN_CITY_NAME + " → " + f.DEST_CITY_NAME + " (" + f.MKT_CARRIER + f.MKT_CARRIER_FL_NUM + ")", 50, y);
-  }
-  
-  popMatrix();
-  
-  //info
-  fill(100);
-  text("Total flights: " + flights.size() + " | Showing rows " + (startRow + 1) + " to " + endRow + " of " + flights.size(), 50, 30);
+    // Calculate visible range for filtered flights
+    int startRow = max(0, floor((-scrollY) / lineHeight));
+    int endRow = min(filteredFlights.size(), startRow + ceil(height / lineHeight) + 1);
+    
+    // Draw visible flights
+    pushMatrix();
+    translate(0, scrollY);
+    
+    for (int i = startRow; i < endRow; i++) {
+      Flight f = filteredFlights.get(i);
+      float y = 130 + i * lineHeight;
+      
+      // Alternate row colors for better readability
+      if (i % 2 == 0) {
+        fill(0);
+      } else {
+        fill(80);
+      }
+      
+      text(f.ORIGIN_CITY_NAME + " → " + f.DEST_CITY_NAME + " (" + f.MKT_CARRIER + f.MKT_CARRIER_FL_NUM + ")", 50, y);
+//Distance
+      String distanceText = f.DISTANCE + " miles"; 
+      text(distanceText, 350, y);
+    }
+    
+    popMatrix();
+    
+    // Info
+    fill(100);
+    text("Total flights: " + flights.size() + " | Showing: " + filteredFlights.size() + 
+         " matching | Rows " + startRow  + " to " + endRow, 50, 50);
   }
 }
 
-//19/03/2026: Xianren, outline and bar chart
-//19/03/2026: Jayden, pie chart
-//Charts
-boolean showChart = false;
-int chartX = 100;
-int chartY = 150;
-int chartWidth = 600;
-int chartHeight = 300;
-String chartType = "flights";
-
+//Chart 
 void drawChart() {
+  //chart background
+  fill(240);
+  stroke(0);
+  rect(chartX, chartY, chartWidth, chartHeight);
+  
   //chart title
   fill(0);
   textAlign(CENTER);
   if (chartType.equals("flights")) {
     text("Flights per Carrier", chartX + chartWidth/2, chartY - 10);
-  } else if (chartType.equals("")) {
-    text("", chartX + chartWidth/2, chartY - 10);
   }
   textAlign(LEFT);
   
   if (chartType.equals("flights")) {
     drawCarrierChart();
-  } else if (chartType.equals("")) {
-   
   }
 }
 
-// Draw flights per carrier chart
+// Draw bar chart with filters (textInput)
 void drawCarrierChart() {
-  //chart background
-  fill(240);
-  stroke(0);
-  rect(chartX, chartY, chartWidth, chartHeight);
-  // Count flights per carrier
+  // Get filter value
+  String searchCity = citySearch.getText();
+  
+  // Count flights per carrier with filters applied
   HashMap<String, Integer> carrierCounts = new HashMap<String, Integer>();
   
   for (Flight f : flights) {
-    String carrier = f.MKT_CARRIER;
-    if (carrierCounts.containsKey(carrier)) {
-      carrierCounts.put(carrier, carrierCounts.get(carrier) + 1);
-    } else {
-      carrierCounts.put(carrier, 1);
+    boolean matches = true;
+    
+    // City filter
+    if (!searchCity.equals("")) {
+      if (!f.ORIGIN_CITY_NAME.toLowerCase().contains(searchCity.toLowerCase()) &&
+          !f.DEST_CITY_NAME.toLowerCase().contains(searchCity.toLowerCase())) {
+        matches = false;
+      }
+    }
+    
+    if (matches) {
+      String carrier = f.MKT_CARRIER;
+      if (carrierCounts.containsKey(carrier)) {
+        carrierCounts.put(carrier, carrierCounts.get(carrier) + 1);
+      } else {
+        carrierCounts.put(carrier, 1);
+      }
     }
   }
   
   int numCarriers = carrierCounts.size();
+  if (numCarriers == 0) {
+    fill(0);
+    text("No flights match the current filters", chartX + chartWidth/3, chartY + chartHeight/2);
+    return;
+  }
+  
   float barWidth = (chartWidth - 100) / numCarriers;
   
   int maxCount = 0;
@@ -234,27 +411,27 @@ void drawCarrierChart() {
 }
 
 void keyPressed() {
+  // Handle input field
+  citySearch.keyPressed(key);
+  
   if (key == CODED) {
     if (keyCode == UP) {
       upPressed = true;
     } else if (keyCode == DOWN) {
       downPressed = true;
     }
-  } else 
+  } else {
     if (key == 'c' || key == 'C') {
       showChart = !showChart;  
       showText = !showText;
-    } else if (key == 'd' || key == 'D') {
-      chartType = "";
-      showChart = true;
-     
     } else if (key == 'f' || key == 'F') {
       if(!showText){
-      chartType = "flights";
-      showChart = true;
+        chartType = "flights";
+        showChart = true;
       }
     }
   }
+}
 
 void keyReleased() {
   if (key == CODED) {
@@ -264,4 +441,8 @@ void keyReleased() {
       downPressed = false;
     }
   }
+}
+
+void mousePressed() {
+  citySearch.mousePressed();
 }
