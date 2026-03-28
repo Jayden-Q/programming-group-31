@@ -1,3 +1,5 @@
+//12/03/2026 Xianren - flight class initialisation and variables
+// Flight class
 class Flight {
   int FL_DATE;
   String MKT_CARRIER;
