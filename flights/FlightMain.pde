@@ -75,3 +75,7 @@ void mouseReleased() {
 void mouseWheel(MouseEvent event) {
   pieChartsScreen.mouseWheel(event);
 }
+
+void mousePressed() {
+  citySearch.mousePressed();
+}
