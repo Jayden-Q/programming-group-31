@@ -25,8 +25,16 @@ class BarChartsScreen {
     }
   }
   
+  void setVisibility(boolean isVisible) {
+    //for (Input input: this.inputs.values()) {
+    //  input.isVisible = isVisible;      
+    //}
+  }
+  
   void draw() {
     background(255);
+    
+    cursor(ARROW);
     
     ArrayList<String> airports = new ArrayList<String>(airportCounts.keySet());
     airports.sort((a, b) -> airportCounts.get(b) - airportCounts.get(a));
