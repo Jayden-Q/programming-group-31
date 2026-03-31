@@ -16,6 +16,12 @@ class Widget {
     this.callback = callback;  
   }
   
+  void triggerCallback() {
+    if (this.callback != null) {
+      this.callback.call();
+    }
+  }
+  
   void mousePressed() {}
   void mouseReleased() {}
   void mouseWheel() {}

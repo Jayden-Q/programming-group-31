@@ -11,6 +11,12 @@ Flights flightsData;
 PieChartsScreen pieChartsScreen;
 SearchScreen searchScreen;
 BarChartsScreen barChartsScreen;
+HomeScreen homeScreen;
+int screenToRenderIndex = 3;
+
+boolean cursorBusy = false;
+
+
 
 // 12/03/2026: Jayden, setup
 void setup() {
@@ -29,30 +35,56 @@ void setup() {
   pieChartsScreen = new PieChartsScreen();
   searchScreen = new SearchScreen();
   barChartsScreen = new BarChartsScreen();
+  homeScreen = new HomeScreen();
 }
 
-
-int screenToRenderIndex = 1;
-
+/* 31/03/26: Jayden
+  - Added buttons to navigate to different screens, fixed bug 
+  - Fixed bug where inputs on one screen were still interactable when under a different screen
+*/
 void draw() {
   switch (screenToRenderIndex) {
     case 0:
+      homeScreen.setVisibility(false);
+      pieChartsScreen.setVisibility(true);
+      searchScreen.setVisibility(false);
+      barChartsScreen.setVisibility(false);
+      
       pieChartsScreen.draw();
       break;
     case 1:
+      homeScreen.setVisibility(false);
+      pieChartsScreen.setVisibility(false);
+      searchScreen.setVisibility(true);
+      barChartsScreen.setVisibility(false);
+      
       searchScreen.draw();
       break;
     case 2:
+      homeScreen.setVisibility(false);
+      pieChartsScreen.setVisibility(false);
+      searchScreen.setVisibility(false);
+      barChartsScreen.setVisibility(true);
+      
       barChartsScreen.draw();
       break;
-    default:
-      searchScreen.draw();
+    case 3:
+      homeScreen.setVisibility(true);
+      pieChartsScreen.setVisibility(false);
+      searchScreen.setVisibility(false);
+      barChartsScreen.setVisibility(false);
+      
+      homeScreen.draw();
+      break; 
   }
 }
 
 void keyPressed() {
   // TEMPORARY: Press 'l' to switch screens
-  if (key == 'l') screenToRenderIndex = ++screenToRenderIndex % 3;
+  if (!cursorBusy) {
+    if (key == 'l') screenToRenderIndex = ++screenToRenderIndex % 4;
+    if (key == 'k') screenToRenderIndex = 3;
+  }
   
   searchScreen.keyPressed();
 }
@@ -66,10 +98,12 @@ void keyReleased() {
 void mousePressed() {
   pieChartsScreen.mousePressed();
   searchScreen.mousePressed();
+  homeScreen.mousePressed();
 }
 
 void mouseReleased() {
   pieChartsScreen.mouseReleased();
+  homeScreen.mouseReleased();
 }
 
 void mouseWheel(MouseEvent event) {

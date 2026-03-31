@@ -1,4 +1,4 @@
-// 24/03/26: Pie Charts Screen
+// 24/03/26: Jayden, Pie Charts Screen
 class PieChartsScreen {
   LinkedHashMap<String, PieChart> pieCharts = new LinkedHashMap<String, PieChart>();
   HashMap<String, Input> inputs = new HashMap<String, Input>();
@@ -71,10 +71,21 @@ class PieChartsScreen {
     });
     
     
+    Button btn = new Button(1000, 400, 250, 40, "Button");
+   
+    btn.onChange(new Callback() {
+      @Override
+      public void call() {
+        println("hello");
+      }
+    });
+    
+    
     // Add all inputs to hashmap
     this.inputs.put("sectionsSlider", sectionsSlider);
     this.inputs.put("originOrDestDropdown", originOrDestDropdown);
     this.inputs.put("distanceSlider", distanceSlider);
+    this.inputs.put("btn", btn);
   }
   
   PieChart createChart(String name, String title, float x, float y, float w, float h, ChartData data) {
@@ -116,18 +127,33 @@ class PieChartsScreen {
     pieCharts.get("topCarriers").setData(carriersData.labels, carriersData.values);
   }
   
+  void setVisibility(boolean isVisible) {
+    for (Input input: this.inputs.values()) {
+      input.isVisible = isVisible;      
+    }
+  }
+  
   void update() {}
   
   void draw() {
     background(#eeeeee);
+    
+    int currentCursor = ARROW;
     
     this.carousel.update();
     this.carousel.draw();
     
     for (Input input : this.inputs.values()) {
       input.update();
+      
+      if (input.isVisible && input.isHovered) {
+        currentCursor = input.getCursorType();
+      }
+      
       input.draw();
-    }    
+    }
+    
+    cursor(currentCursor);
   }
   
   
