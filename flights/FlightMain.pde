@@ -1,6 +1,9 @@
 import java.util.*;
 import processing.event.*;
 
+// Navigation object
+Navigation nav;
+
 // Base font
 PFont widgetFont;
 
@@ -11,17 +14,13 @@ Flights flightsData;
 PieChartsScreen pieChartsScreen;
 SearchScreen searchScreen;
 BarChartsScreen barChartsScreen;
-HomeScreen homeScreen;
-int screenToRenderIndex = 3;
 
-boolean cursorBusy = false;
-
-
+int screenToRenderIndex = 1;
 
 // 12/03/2026: Jayden, setup
 void setup() {
   // Screen size
-  size(1400, 900);
+  size(1400, 700);
   
   // Font
   widgetFont = createFont("Arial", 14);
@@ -35,77 +34,89 @@ void setup() {
   pieChartsScreen = new PieChartsScreen();
   searchScreen = new SearchScreen();
   barChartsScreen = new BarChartsScreen();
-  homeScreen = new HomeScreen();
+  
+  // Initialize navigation
+  nav = new Navigation(50, 20, 120, 40);
+  nav.addButton("Pie Chart", 0);
+  nav.addButton("Search city", 1);
+  nav.addButton("Bar Chart", 2);
 }
 
-/* 31/03/26: Jayden
-  - Added buttons to navigate to different screens, fixed bug 
-  - Fixed bug where inputs on one screen were still interactable when under a different screen
-*/
 void draw() {
+  background(#eeeeee);
+  // Update and draw button
+  nav.update();
+  nav.draw();
+  
+  // Get current screen from button
+  screenToRenderIndex = nav.getCurrentScreen();
+      
+  // Draw current screen
   switch (screenToRenderIndex) {
     case 0:
-      homeScreen.setVisibility(false);
-      pieChartsScreen.setVisibility(true);
-      searchScreen.setVisibility(false);
-      barChartsScreen.setVisibility(false);
-      
       pieChartsScreen.draw();
       break;
     case 1:
-      homeScreen.setVisibility(false);
-      pieChartsScreen.setVisibility(false);
-      searchScreen.setVisibility(true);
-      barChartsScreen.setVisibility(false);
-      
       searchScreen.draw();
       break;
     case 2:
-      homeScreen.setVisibility(false);
-      pieChartsScreen.setVisibility(false);
-      searchScreen.setVisibility(false);
-      barChartsScreen.setVisibility(true);
-      
       barChartsScreen.draw();
       break;
-    case 3:
-      homeScreen.setVisibility(true);
-      pieChartsScreen.setVisibility(false);
-      searchScreen.setVisibility(false);
-      barChartsScreen.setVisibility(false);
-      
-      homeScreen.draw();
-      break; 
+    default:
+      searchScreen.draw();
   }
 }
 
 void keyPressed() {
-  // TEMPORARY: Press 'l' to switch screens
-  if (!cursorBusy) {
-    if (key == 'l') screenToRenderIndex = ++screenToRenderIndex % 4;
-    if (key == 'k') screenToRenderIndex = 3;
+  // Pass key press to active screen
+  if (screenToRenderIndex == 0) {
+    pieChartsScreen.keyPressed();
+  } else if (screenToRenderIndex == 1) {
+    searchScreen.keyPressed();
+  } else if (screenToRenderIndex == 2) {
+    barChartsScreen.keyPressed();
+  }
+}
+
+void keyReleased() {
+  // Pass key release to search screen for scrolling
+  if (screenToRenderIndex == 1) {
+    searchScreen.keyReleased();
+  }
+}
+
+void mousePressed() {
+  // Check navigation buttons first
+  int newScreen = nav.checkClick();
+  if (newScreen != nav.getCurrentScreen()) {
+    // Screen changed by button click
+    return;
   }
   
-  searchScreen.keyPressed();
-}
-
-//12/03/2026 Abdul - scrolling using up and down key
-void keyReleased() {
-  searchScreen.keyReleased();
-}
-
-// 24/03/26: Jayden, mouse events
-void mousePressed() {
-  pieChartsScreen.mousePressed();
-  searchScreen.mousePressed();
-  homeScreen.mousePressed();
+  // Pass mouse press to active screen
+  if (screenToRenderIndex == 0) {
+    pieChartsScreen.mousePressed();
+  } else if (screenToRenderIndex == 1) {
+    searchScreen.mousePressed();
+  } else if (screenToRenderIndex == 2) {
+    barChartsScreen.mousePressed();
+  }
 }
 
 void mouseReleased() {
-  pieChartsScreen.mouseReleased();
-  homeScreen.mouseReleased();
+  // Pass mouse release to active screen
+  if (screenToRenderIndex == 0) {
+    pieChartsScreen.mouseReleased();
+  } else if (screenToRenderIndex == 2) {
+    barChartsScreen.mouseReleased();
+  }
 }
 
 void mouseWheel(MouseEvent event) {
-  pieChartsScreen.mouseWheel(event);
+  // Pass mouse wheel to screens that need it
+  if (screenToRenderIndex == 0) {
+    pieChartsScreen.mouseWheel(event);
+  } else if (screenToRenderIndex == 2) {
+    barChartsScreen.mouseWheel(event);
+  }
 }
