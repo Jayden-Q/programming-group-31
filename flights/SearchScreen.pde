@@ -36,8 +36,6 @@ class SearchScreen {
   
   //12/03/2026 Abdul, scroll
   void draw() {
-    background(255);
-
     int currentCursor = ARROW;
   
     // Update and draw input field
