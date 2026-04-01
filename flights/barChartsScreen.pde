@@ -25,17 +25,7 @@ class BarChartsScreen {
     }
   }
   
-  void setVisibility(boolean isVisible) {
-    //for (Input input: this.inputs.values()) {
-    //  input.isVisible = isVisible;      
-    //}
-  }
-  
   void draw() {
-    background(255);
-    
-    cursor(ARROW);
-    
     ArrayList<String> airports = new ArrayList<String>(airportCounts.keySet());
     airports.sort((a, b) -> airportCounts.get(b) - airportCounts.get(a));
   
@@ -105,7 +95,6 @@ class BarChartsScreen {
       text(count, x + barWidth/2, y - barHeight - 10);
     }
   }
-
   void keyPressed() {
     // Handle key presses for bar chart screen if needed
   }
@@ -117,7 +106,6 @@ class BarChartsScreen {
   void mouseReleased() {
     // Handle mouse release for bar chart screen if needed
   }
-
    void mouseWheel(MouseEvent event) {
     // Handle mouse wheel scrolling for bar chart screen if needed
   }
