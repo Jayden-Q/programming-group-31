@@ -24,33 +24,13 @@ class SearchScreen {
     citySearch.setDefaultValue("");
   }
   
-  void setVisibility(boolean isVisible) {
-    //for (Input input: this.inputs.values()) {
-    //  input.isVisible = isVisible;      
-    //}
-    
-    citySearch.isVisible = isVisible;
-  }
-  
   void update() {}
   
   //12/03/2026 Abdul, scroll
   void draw() {
-    int currentCursor = ARROW;
-  
     // Update and draw input field
     citySearch.update();
-    
-    if (citySearch.isVisible && citySearch.isHovered) {
-      currentCursor = citySearch.getCursorType();
-    }
-    
-    if (citySearch.isActive) cursorBusy = true;
-    else cursorBusy = false;
-    
     citySearch.draw();
-    
-    cursor(currentCursor);
     
     // Draw charts
     if (showChart) {
