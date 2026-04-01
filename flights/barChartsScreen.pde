@@ -105,4 +105,20 @@ class BarChartsScreen {
       text(count, x + barWidth/2, y - barHeight - 10);
     }
   }
+
+  void keyPressed() {
+    // Handle key presses for bar chart screen if needed
+  }
+  
+  void mousePressed() {
+    // Handle mouse clicks for bar chart screen if needed
+  }
+  
+  void mouseReleased() {
+    // Handle mouse release for bar chart screen if needed
+  }
+
+   void mouseWheel(MouseEvent event) {
+    // Handle mouse wheel scrolling for bar chart screen if needed
+  }
 }
