@@ -1,5 +1,6 @@
 import java.util.*;
 import processing.event.*;
+Table table, table2, table3, table4;
 
 // Navigation object
 Navigation nav;
@@ -27,8 +28,12 @@ void setup() {
   textFont(widgetFont);
   
   // Load CSV file
-  Table table = loadTable("flights2k.csv", "header");
+  table = loadTable("flights2k.csv", "header");
+  table2 = loadTable("flights10k.csv", "header");
+  table3 = loadTable("flights100k.csv", "header");
+  table4 = loadTable("flights_full.csv", "header");
   flightsData = new Flights(table);
+  
   
   // Initialize screens
   pieChartsScreen = new PieChartsScreen();
@@ -100,6 +105,12 @@ void mousePressed() {
     searchScreen.mousePressed();
   } else if (screenToRenderIndex == 2) {
     barChartsScreen.mousePressed();
+  }
+  
+  if (key == 'z' || key == 'Z') {
+         flightsData = new Flights(table);
+  } else if (key == 'x' || key == 'X') {
+         flightsData = new Flights(table2);
   }
 }
 
