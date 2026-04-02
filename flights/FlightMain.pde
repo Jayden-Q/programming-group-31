@@ -20,7 +20,7 @@ int screenToRenderIndex = 1;
 // 12/03/2026: Jayden, setup
 void setup() {
   // Screen size
-  size(1400, 700);
+  size(1400, 900);
   
   // Font
   widgetFont = createFont("Arial", 14);
