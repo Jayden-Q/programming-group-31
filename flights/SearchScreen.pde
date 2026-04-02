@@ -104,7 +104,7 @@ class SearchScreen {
       // Info
       fill(100);
       text("Total flights: " + flightsData.flights.size() + " | Showing: " + filteredFlights.size() + 
-           " matching | Rows " + startRow  + " to " + endRow, 50, 50);
+           " matching | Rows " + startRow  + " to " + endRow, 350, 100);
     }
   }
   
