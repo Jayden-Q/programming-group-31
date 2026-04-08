@@ -41,8 +41,8 @@ void setup() {
   table2 = loadTable("flights10k.csv", "header");
   table3 = loadTable("flights100k.csv", "header");
   table4 = loadTable("flights_full.csv", "header");
+
   flightsData = new Flights(table);
-  
   
   // Initialize screens
   pieChartsScreen = new PieChartsScreen(flightsData);

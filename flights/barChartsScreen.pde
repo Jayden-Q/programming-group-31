@@ -17,9 +17,9 @@ class BarChartsScreen {
 
   boolean showMiles = false;
 
-  Flights flightsData;
-  
   boolean draggingSlider = false;
+  
+  Flights flightsData;
 
   // colors for each bar 
   color[] barColors = {
