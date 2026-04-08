@@ -1,5 +1,6 @@
 import java.util.*;
 import processing.event.*;
+Table table, table2, table3, table4;
 
 // Navigation object
 Navigation nav;
@@ -11,12 +12,14 @@ Dropdown datasetDropdown;
 PFont widgetFont;
 
 // Management class for flights
-Flights flightsData2k;
+//Flights flightsData2k;
 //Flights flightsData10k;
 //Flights flightsData100k;
 //Flights flightsDataAll;
 
-Flights selectedDataset;
+//Flights selectedDataset;
+
+Flights flightsData;
 
 // Screens
 PieChartsScreen pieChartsScreen;
@@ -36,24 +39,16 @@ void setup() {
   textFont(widgetFont);
   
   // Load CSV file
-  Table flightsData2kTable = loadTable("flights2k.csv", "header");
-  flightsData2k = new Flights(flightsData2kTable);
-  
-  //Table flightsData10kTable = loadTable("flights10k.csv", "header");
-  //flightsData10k = new Flights(flightsData10kTable);
-  
-  //Table flightsData100kTable = loadTable("flights100k.csv", "header");
-  //flightsData100k = new Flights(flightsData100kTable);
-  
-  //Table flightsDataAllTable = loadTable("flights_full.csv", "header");
-  //flightsDataAll = new Flights(flightsDataAllTable);
-  
-  selectedDataset = flightsData2k;
+  table = loadTable("flights2k.csv", "header");
+  table2 = loadTable("flights10k.csv", "header");
+  table3 = loadTable("flights100k.csv", "header");
+  table4 = loadTable("flights_full.csv", "header");
+  flightsData = new Flights(table);  
   
   // Initialize screens
-  pieChartsScreen = new PieChartsScreen(selectedDataset);
-  searchScreen = new SearchScreen(selectedDataset);
-  barChartsScreen = new BarChartsScreen(selectedDataset);
+  pieChartsScreen = new PieChartsScreen(flightsData);
+  searchScreen = new SearchScreen(flightsData);
+  barChartsScreen = new BarChartsScreen(flightsData);
   
   // Initialize navigation
   nav = new Navigation(50, 20, 120, 40);
@@ -158,6 +153,12 @@ void mousePressed() {
     searchScreen.mousePressed();
   } else if (screenToRenderIndex == 2) {
     barChartsScreen.mousePressed();
+  }
+  
+  if (key == 'z' || key == 'Z') {
+         flightsData = new Flights(table);
+  } else if (key == 'x' || key == 'X') {
+         flightsData = new Flights(table2);
   }
 }
 
