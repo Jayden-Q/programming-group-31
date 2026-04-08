@@ -4,11 +4,19 @@ import processing.event.*;
 // Navigation object
 Navigation nav;
 
+// Dropdown for selecting dataset
+Dropdown datasetDropdown;
+
 // Base font
 PFont widgetFont;
 
 // Management class for flights
-Flights flightsData;
+Flights flightsData2k;
+//Flights flightsData10k;
+//Flights flightsData100k;
+//Flights flightsDataAll;
+
+Flights selectedDataset;
 
 // Screens
 PieChartsScreen pieChartsScreen;
@@ -16,38 +24,79 @@ SearchScreen searchScreen;
 BarChartsScreen barChartsScreen;
 
 int screenToRenderIndex = 1;
+boolean cursorBusy = false;
 
 // 12/03/2026: Jayden, setup
 void setup() {
   // Screen size
-  size(1400, 700);
+  size(1400, 900);
   
   // Font
   widgetFont = createFont("Arial", 14);
   textFont(widgetFont);
   
   // Load CSV file
-  Table table = loadTable("flights2k.csv", "header");
-  flightsData = new Flights(table);
+  Table flightsData2kTable = loadTable("flights2k.csv", "header");
+  flightsData2k = new Flights(flightsData2kTable);
+  
+  //Table flightsData10kTable = loadTable("flights10k.csv", "header");
+  //flightsData10k = new Flights(flightsData10kTable);
+  
+  //Table flightsData100kTable = loadTable("flights100k.csv", "header");
+  //flightsData100k = new Flights(flightsData100kTable);
+  
+  //Table flightsDataAllTable = loadTable("flights_full.csv", "header");
+  //flightsDataAll = new Flights(flightsDataAllTable);
+  
+  selectedDataset = flightsData2k;
   
   // Initialize screens
-  pieChartsScreen = new PieChartsScreen();
-  searchScreen = new SearchScreen();
-  barChartsScreen = new BarChartsScreen();
+  pieChartsScreen = new PieChartsScreen(selectedDataset);
+  searchScreen = new SearchScreen(selectedDataset);
+  barChartsScreen = new BarChartsScreen(selectedDataset);
   
   // Initialize navigation
   nav = new Navigation(50, 20, 120, 40);
   nav.addButton("Pie Chart", 0);
   nav.addButton("Search city", 1);
   nav.addButton("Bar Chart", 2);
+  
+  // Initialize dataset dropdown
+  //String[] datasetOptions = {
+  //  "2k",
+  //  "10k",
+  //  "100k",
+  //  "all"
+  //};
+  //datasetDropdown = new Dropdown(width - 250, 40, 200, 40, "Dataset", datasetOptions, 0);
+  //datasetDropdown.setMaxVisibleItems(2);
+  
+  //datasetDropdown.onChange(new Callback() {
+  //  @Override
+  //  void call() {
+  //    switch ((String) datasetDropdown.value) {
+  //      case "2k":
+  //        selectedDataset = flightsData2k;
+  //        pieChartsScreen.changeDataset(selectedDataset);
+  //        break;
+  //      case "10k":
+  //        selectedDataset = flightsData10k;
+  //        pieChartsScreen.changeDataset(selectedDataset);
+  //        break;
+  //      case "100k":
+  //        selectedDataset = flightsData100k;
+  //        break;
+  //      case "all":
+  //        selectedDataset = flightsData100k;
+  //        break;
+  //    }
+  //  }
+  //});
 }
 
 void draw() {
   background(#eeeeee);
-  // Update and draw button
-  nav.update();
-  nav.draw();
-  
+ 
   // Get current screen from button
   screenToRenderIndex = nav.getCurrentScreen();
       
@@ -65,6 +114,13 @@ void draw() {
     default:
       searchScreen.draw();
   }
+  
+  // Update and draw button
+  nav.update();
+  nav.draw();
+  
+//  datasetDropdown.update();
+//  datasetDropdown.draw();
 }
 
 void keyPressed() {
@@ -93,6 +149,8 @@ void mousePressed() {
     return;
   }
   
+  //datasetDropdown.mousePressed();
+  
   // Pass mouse press to active screen
   if (screenToRenderIndex == 0) {
     pieChartsScreen.mousePressed();
@@ -104,6 +162,8 @@ void mousePressed() {
 }
 
 void mouseReleased() {
+  //datasetDropdown.mouseReleased();
+  
   // Pass mouse release to active screen
   if (screenToRenderIndex == 0) {
     pieChartsScreen.mouseReleased();
@@ -119,4 +179,6 @@ void mouseWheel(MouseEvent event) {
   } else if (screenToRenderIndex == 2) {
     barChartsScreen.mouseWheel(event);
   }
+  
+  //datasetDropdown.mouseWheel(event.getCount());
 }

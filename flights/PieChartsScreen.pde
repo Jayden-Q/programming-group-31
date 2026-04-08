@@ -1,11 +1,15 @@
-// 24/03/26: Pie Charts Screen
+// 24/03/26: Jayden, Pie Charts Screen
 class PieChartsScreen {
   LinkedHashMap<String, PieChart> pieCharts = new LinkedHashMap<String, PieChart>();
-  HashMap<String, Input> inputs = new HashMap<String, Input>();
+  LinkedHashMap<String, Input> inputs = new LinkedHashMap<String, Input>();
   
   Carousel carousel;
   
-  PieChartsScreen() {
+  Flights flightsData;
+  
+  PieChartsScreen(Flights flightsData) {
+    this.flightsData = flightsData;
+    
     createChart("mostFlights", "Airports with Most Flights", 200, 150, 600, 600, flightsData.topNOrigins(flightsData.flights, 5));
     createChart("leastFlights", "Airports with Least Flights", 200, 150, 600, 600, flightsData.bottomNOrigins(flightsData.flights, 5));
     
@@ -21,7 +25,7 @@ class PieChartsScreen {
     ////////////
     // SLIDER //
     ////////////
-    Slider sectionsSlider = new Slider(1000, 100, 250, 20, "Sections to show", 1, flightsData.flights.size());
+    Slider sectionsSlider = new Slider(1000, 200, 250, 20, "Max sections to show", 1, flightsData.flights.size());
     sectionsSlider.setValue(5);
     sectionsSlider.setUnit(" airports");
     sectionsSlider.setDataType(Input.TYPE_INT);
@@ -42,7 +46,7 @@ class PieChartsScreen {
       "destination",
     };
     
-    Dropdown originOrDestDropdown = new Dropdown(1000, 200, 220, 30, "Airport", airports, 0);
+    Dropdown originOrDestDropdown = new Dropdown(1000, 300, 220, 30, "Airport", airports, 0);
     originOrDestDropdown.setMaxVisibleItems(5);
     
     originOrDestDropdown.onChange(new Callback() {
@@ -56,7 +60,7 @@ class PieChartsScreen {
     //////////////////
     // Range Slider //
     //////////////////
-    RangeSlider distanceSlider = new RangeSlider(1000, 300, 250, 20, "Distance",
+    RangeSlider distanceSlider = new RangeSlider(1000, 400, 250, 20, "Distance",
       flightsData.getMinDistance(flightsData.flights), flightsData.getMaxDistance(flightsData.flights));
     distanceSlider.setUnit("mi");
     distanceSlider.setLowValue(flightsData.getMinDistance(flightsData.flights));
@@ -70,11 +74,10 @@ class PieChartsScreen {
       }
     });
     
-    
     // Add all inputs to hashmap
     this.inputs.put("sectionsSlider", sectionsSlider);
-    this.inputs.put("originOrDestDropdown", originOrDestDropdown);
     this.inputs.put("distanceSlider", distanceSlider);
+    this.inputs.put("originOrDestDropdown", originOrDestDropdown);
   }
   
   PieChart createChart(String name, String title, float x, float y, float w, float h, ChartData data) {
@@ -83,12 +86,30 @@ class PieChartsScreen {
     return chart;
   }
   
+  void changeDataset(Flights flightsData) {
+    this.flightsData = flightsData;
+    
+    Slider sectionsSlider = (Slider) this.inputs.get("sectionsSlider");
+    RangeSlider distanceSlider = (RangeSlider) this.inputs.get("distanceSlider");
+    
+    // Update min/max values for max sections slider
+    sectionsSlider.setMinValue(1);
+    sectionsSlider.setMaxValue(flightsData.flights.size());
+    
+    // Update min/max values for distance slider
+    distanceSlider.setMinValue(flightsData.getMinDistance(flightsData.flights));
+    distanceSlider.setMaxValue(flightsData.getMaxDistance(flightsData.flights));
+    
+    updateCharts();
+  }
+  
   void updateCharts() {
     Slider sectionsSlider = (Slider) this.inputs.get("sectionsSlider");
     Dropdown originOrDestDropdown = (Dropdown) this.inputs.get("originOrDestDropdown");
     RangeSlider distanceSlider = (RangeSlider) this.inputs.get("distanceSlider");
     
-    int sections = (int) sectionsSlider.value;
+    int sections = constrain((int) sectionsSlider.value, (int)sectionsSlider.minV, (int)sectionsSlider.maxV);
+    sectionsSlider.setValue(sections);
     float minDistance = (float) distanceSlider.getLowValue();
     float maxDistance = (float) distanceSlider.getHighValue();
   
@@ -116,20 +137,43 @@ class PieChartsScreen {
     pieCharts.get("topCarriers").setData(carriersData.labels, carriersData.values);
   }
   
+  void setVisibility(boolean isVisible) {
+    for (Input input: this.inputs.values()) {
+      input.isVisible = isVisible;      
+    }
+  }
+  
   void update() {}
   
   void draw() {
+    background(#eeeeee);
+    
+    int currentCursor = ARROW;
+    
     this.carousel.update();
     this.carousel.draw();
     
     for (Input input : this.inputs.values()) {
       input.update();
+      
+      if (input.isVisible && input.isHovered) {
+        currentCursor = input.getCursorType();
+      }
+      
       input.draw();
-    }    
+    }
+    
+    if (this.carousel.overLeftArrow(mouseX, mouseY) || this.carousel.overRightArrow(mouseX, mouseY)) {
+      currentCursor = HAND;
+    }
+    
+    cursor(currentCursor);
   }
-  
+    
   
   // EVENTS
+  void keyPressed() {}
+  
   void mousePressed() {
     for (Input input : this.inputs.values()) {
       input.mousePressed();
@@ -148,9 +192,5 @@ class PieChartsScreen {
     for (Input input : this.inputs.values()) {
       input.mouseWheel(event.getCount());
     }
-  }
-  
-  void keyPressed() {
-    // Handle key presses for bar chart screen if needed
   }
 }

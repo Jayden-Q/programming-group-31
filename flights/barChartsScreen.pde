@@ -1,7 +1,11 @@
 class BarChartsScreen {
   HashMap<String, Integer> airportCounts = new HashMap<String, Integer>();
   
-  BarChartsScreen() {
+  Flights flightsData;
+  
+  BarChartsScreen(Flights flightsData) {
+    this.flightsData = flightsData;
+    
     this.countAirports();
   }
   

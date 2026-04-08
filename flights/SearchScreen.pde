@@ -17,9 +17,12 @@ class SearchScreen {
   
   TextInput citySearch;
   
-  SearchScreen() {
+  Flights flightsData;
+  
+  SearchScreen(Flights flightsData) {
     //26/03/2026 Xianren - added citySearch for text input
     // Create input field
+    this.flightsData = flightsData;
     citySearch = new TextInput("Search City:", 50, 80, 250, 30);
     citySearch.setDefaultValue("");
   }

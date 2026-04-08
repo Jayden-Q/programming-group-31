@@ -50,20 +50,20 @@ class Input {
 
   void setDataType(int type) {
     switch (type) {
-    case TYPE_STRING:
-      this.dataType = TYPE_STRING;
-      break;
-    case TYPE_INT:
-      this.dataType = TYPE_INT;
-      break;
-    case TYPE_FLOAT:
-      this.dataType = TYPE_FLOAT;
-      break;
-    case TYPE_BOOL:
-      this.dataType = TYPE_BOOL;
-      break;
-    default:
-      this.dataType = TYPE_STRING;
+      case TYPE_STRING:
+        this.dataType = TYPE_STRING;
+        break;
+      case TYPE_INT:
+        this.dataType = TYPE_INT;
+        break;
+      case TYPE_FLOAT:
+        this.dataType = TYPE_FLOAT;
+        break;
+      case TYPE_BOOL:
+        this.dataType = TYPE_BOOL;
+        break;
+      default:
+        this.dataType = TYPE_STRING;
     }
   }
 
@@ -117,13 +117,17 @@ class Input {
   }
 
   void triggerCallback() {
-    if (this.callback != null) {
+    if (this.callback != null && this.isVisible) {
       this.callback.call();
     }
   }
 
+  int getCursorType() {
+    return ARROW;
+  }
+
   void update() {
-    this.isHovered = isMouseHovering();
+    this.isHovered = isMouseHovering() && this.isVisible;
   }
 
   void draw() {
@@ -182,6 +186,18 @@ class Slider extends Input {
   void setUnit(String unit) {
     this.unit = unit;
   }
+  
+  void setMinValue(Object value) {
+    if (value instanceof Number) {
+      this.minV = ((Number)value).floatValue();
+    }
+  }
+  
+  void setMaxValue(Object value) {
+    if (value instanceof Number) {
+      this.maxV = ((Number)value).floatValue();
+    }
+  }
 
   void mousePressed() {
     if (isMouseHovering()) {
@@ -195,6 +211,10 @@ class Slider extends Input {
   void mouseReleased() {
     this.isDragging = false;
     this.isActive = false;
+  }
+  
+  int getCursorType() {
+    return HAND;
   }
 
   void update() {
@@ -321,6 +341,10 @@ class RangeSlider extends Slider {
     draggingLow = false;
     draggingHigh = false;
   }
+  
+  int getCursorType() {
+    return HAND;
+  }
 
   void update() {
     super.update();
@@ -333,7 +357,7 @@ class RangeSlider extends Slider {
     boolean overLow = dist(mouseX, mouseY, lowX, cy) <= r;
     boolean overHigh = dist(mouseX, mouseY, highX, cy) <= r;
 
-    this.isHovered = overLow || overHigh || draggingLow || draggingHigh;
+    this.isHovered = (overLow || overHigh || draggingLow || draggingHigh || this.isMouseHovering()) && this.isVisible;
 
     //if (this.isHovered) {
     //  cursor(HAND);
@@ -545,11 +569,15 @@ class Dropdown extends Input {
   }
 
   void update() {
-    this.isHovered = isOverClosedBox() || (this.isOpen && isOverList());
+    this.isHovered = (isOverClosedBox() || (this.isOpen && isOverList())) && this.isVisible;
 
     //if (this.isHovered) {
     //  cursor(HAND);
     //}
+  }
+  
+  int getCursorType() {
+    return HAND;
   }
 
   void draw() {
@@ -651,6 +679,8 @@ class Dropdown extends Input {
   }
 }
 
+
+
 //26/03/2026 Xianren - text input extension for searching
 // TextInput 
 class TextInput extends Input {
@@ -676,5 +706,69 @@ class TextInput extends Input {
       this.value = (String)this.value + key;
       triggerCallback();
     }
+  }
+  
+  int getCursorType() {
+    return TEXT;
+  }
+}
+
+
+
+// 28/03/26: Jayden, Button class
+class Button extends Input {
+
+  Button(float x, float y, float w, float h, String label) {
+    super(x, y, w, h, label);
+  }
+  
+  boolean isMouseHovering() {
+    return mouseX > this.x && mouseX < this.x + this.w &&
+      mouseY > this.y && mouseY < this.y + this.h;
+  }
+  
+  void mousePressed() {
+    this.isActive = isMouseHovering();
+  }
+  
+  void mouseReleased() {
+    if (this.isActive) {
+      this.triggerCallback();
+      
+      this.isActive = false;
+    }
+  }
+  
+  void update() {
+    this.isHovered = isMouseHovering() && this.isVisible;
+  }
+  
+  int getCursorType() {
+    return HAND;
+  }
+  
+  void draw() {
+    if (!this.isVisible) return;
+    
+    // Draw button background
+    //stroke(0);
+    noStroke();
+    
+    if (this.isActive) {
+      fill(255, 255, 200);
+    } else {
+      if (this.isHovered) {
+        fill(#f2f6fa);
+      } else {
+        fill(255);
+      }
+    }
+    
+    rect(this.x, this.y, this.w, this.h);
+    
+    // Label
+    fill(0);
+    textAlign(CENTER, CENTER);
+    text(this.label, this.x + this.w / 2, this.y + this.h / 2);
   }
 }
