@@ -6,10 +6,8 @@ class SearchScreen {
   boolean upPressed = false;
   boolean downPressed = false;
   
-  boolean showText = true;
-  boolean showChart = false;
-  int chartX = 100;
-  int chartY = 150;
+  int chartX = 550;
+  int chartY = 300;
   int chartWidth = 600;
   int chartHeight = 300;
   String chartType = "flights";
@@ -35,10 +33,8 @@ class SearchScreen {
     citySearch.update();
     citySearch.draw();
     
-    // Draw charts
-    if (showChart) {
-      drawChart();
-    }
+    // Draw chart
+    drawChart();
     
     if (upPressed) {
       targetScroll += scrollSpeed;
@@ -58,57 +54,55 @@ class SearchScreen {
     // Get filter value
     String searchCity = (String) citySearch.getValue();
     
-    if(showText){
-      // Filter flights based on search
-      ArrayList<Flight> filteredFlights = new ArrayList<Flight>();
-      for (Flight f : flightsData.flights) {
-        boolean matches = true;
+    // Filter flights based on search
+    ArrayList<Flight> filteredFlights = new ArrayList<Flight>();
+    for (Flight f : flightsData.flights) {
+      boolean matches = true;
         
-        // City filter (searches both origin and destination)
-        if (!searchCity.equals("")) {
-          if (!f.ORIGIN_CITY_NAME.toLowerCase().contains(searchCity.toLowerCase()) &&
-              !f.DEST_CITY_NAME.toLowerCase().contains(searchCity.toLowerCase())) {
+      // City filter (searches both origin and destination)
+      if (!searchCity.equals("")) {
+        if (!f.ORIGIN_CITY_NAME.toLowerCase().contains(searchCity.toLowerCase()) &&
+            !f.DEST_CITY_NAME.toLowerCase().contains(searchCity.toLowerCase())) {
             matches = false;
-          }
-        }
-        
-        if (matches) {
-          filteredFlights.add(f);
         }
       }
-      
-      // Calculate visible range for filtered flights
-      int startRow = max(0, floor((-scrollY) / lineHeight));
-      int endRow = min(filteredFlights.size(), startRow + ceil(height / lineHeight) + 1);
-      
-      // Draw visible flights
-      pushMatrix();
-      translate(0, scrollY);
-      
-      for (int i = startRow; i < endRow; i++) {
-        Flight f = filteredFlights.get(i);
-        float y = 130 + i * lineHeight;
         
-        // Alternate row colors for better readability
-        if (i % 2 == 0) {
-          fill(0);
-        } else {
-          fill(80);
-        }
-        
-        text(f.ORIGIN_CITY_NAME + " → " + f.DEST_CITY_NAME + " (" + f.MKT_CARRIER + f.MKT_CARRIER_FL_NUM + ")", 50, y);
-  //Distance
-        String distanceText = f.DISTANCE + " miles"; 
-        text(distanceText, 350, y);
+      if (matches) {
+        filteredFlights.add(f);
       }
-      
-      popMatrix();
-      
-      // Info
-      fill(100);
-      text("Total flights: " + flightsData.flights.size() + " | Showing: " + filteredFlights.size() + 
-           " matching | Rows " + startRow  + " to " + endRow, 50, 50);
     }
+      
+    // Calculate visible range for filtered flights
+    int startRow = max(0, floor((-scrollY) / lineHeight));
+    int endRow = min(filteredFlights.size(), startRow + ceil(height / lineHeight) + 1);
+      
+    // Draw visible flights
+    pushMatrix();
+    translate(0, scrollY);
+      
+    for (int i = startRow; i < endRow; i++) {
+      Flight f = filteredFlights.get(i);
+      float y = 130 + i * lineHeight;
+        
+      // Alternate row colors for better readability
+      if (i % 2 == 0) {
+        fill(0);
+      } else {
+        fill(80);
+      }
+        
+      text(f.ORIGIN_CITY_NAME + " → " + f.DEST_CITY_NAME + " (" + f.MKT_CARRIER + f.MKT_CARRIER_FL_NUM + ")", 50, y);
+      //Distance
+      String distanceText = f.DISTANCE + " miles"; 
+      text(distanceText, 350, y);
+    }
+      
+    popMatrix();
+      
+    // Info
+    fill(100);
+    text("Total flights: " + flightsData.flights.size() + " | Showing: " + filteredFlights.size() + 
+         " matching | Rows " + startRow  + " to " + endRow, 350, 100);
   }
   
   //19/03/2026: Xianren, outline and bar chart
@@ -125,10 +119,7 @@ class SearchScreen {
       text("Flights per Carrier", chartX + chartWidth/2, chartY - 10);
     }
     textAlign(LEFT);
-    
-    if (chartType.equals("flights")) {
-      drawCarrierChart();
-    }
+    drawCarrierChart();
   }
   
   // Draw bar chart with filters (textInput)
@@ -211,16 +202,6 @@ class SearchScreen {
         upPressed = true;
       } else if (keyCode == DOWN) {
         downPressed = true;
-      }
-    } else {
-      if (key == 'c' || key == 'C') {
-        showChart = !showChart;  
-        showText = !showText;
-      } else if (key == 'f' || key == 'F') {
-        if(!showText){
-          chartType = "flights";
-          showChart = true;
-        }
       }
     }
   }
