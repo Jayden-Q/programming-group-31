@@ -1,7 +1,17 @@
 //abdul bar chart screen
 class BarChartsScreen {
-
+  
+  //I created a class called barchartsscreen to handle the data processing etc
+  //To store data Used 2 hash maps. Each airport code is the key and the value is either flight or distance
+  //To process data, (count data function loops through all flights and update hash map )i implemented a mode system - 0 incoming flights using dest 1 origin 2 both Allows us to see analyse traffic both ways
+  //Sorting - stored airpot codes in array list and sorted using collection.sort and using comparator filter by miles etc
+  //Draw the chart- setup colours, margins and used loop to draw each bar using rect(). Used map function to fit proportional scale
+  //Added axes using line() and text()
+  //Implemented a slider to allow user how many airport displayed. Used contrain() to keep within the valid limits
+  //Toggle between flights and miles using boolean showmiles
+  //Added diff colours and text labels for user experience 
   // Stores number of flights per airport 
+  
   HashMap<String, Integer> flightCounts = new HashMap<String, Integer>();
 
   // Stores total miles per airport 
@@ -35,7 +45,7 @@ class BarChartsScreen {
     color(192, 57, 43)
   };
 
-  // Constructor: runs when screen is created
+  // Constructor - saves flight data so other func can use
   BarChartsScreen(Flights flightsData) {
     this.flightsData = flightsData;
     
