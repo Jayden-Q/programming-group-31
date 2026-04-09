@@ -715,7 +715,7 @@ class TextInput extends Input {
 
 
 
-// 28/03/26: Jayden, Button class
+// 28/03/26: Jayden, Button class, Multi-select dropdown
 class Button extends Input {
 
   Button(float x, float y, float w, float h, String label) {
@@ -770,5 +770,299 @@ class Button extends Input {
     fill(0);
     textAlign(CENTER, CENTER);
     text(this.label, this.x + this.w / 2, this.y + this.h / 2);
+  }
+}
+
+
+////////////////////////////////////////
+/////////Multi-Select Dropdown//////////
+////////////////////////////////////////
+class MultiSelectDropdown extends Dropdown {
+  boolean[] selected;
+  String emptyDisplayText = "Select...";
+  color selectedCircleColor = color(50, 180, 80);
+
+  MultiSelectDropdown(float x, float y, float w, float h, String label, String[] options) {
+    super(x, y, w, h, label, options, 0);
+
+    this.selected = new boolean[this.options.length];
+
+    this.selectedIndex = -1;
+    updateValue();
+  }
+
+  MultiSelectDropdown(float x, float y, float w, float h, String label, String[] options, int[] defaultSelectedIndices) {
+    super(x, y, w, h, label, options, 0);
+
+    this.selected = new boolean[this.options.length];
+    this.selectedIndex = -1;
+
+    if (defaultSelectedIndices != null) {
+      for (int i = 0; i < defaultSelectedIndices.length; i++) {
+        int idx = defaultSelectedIndices[i];
+        if (idx >= 0 && idx < this.selected.length) {
+          this.selected[idx] = true;
+        }
+      }
+    }
+
+    updateValue();
+  }
+
+  void setValue(Object value) {
+    if (value == null) return;
+
+    for (int i = 0; i < this.selected.length; i++) {
+      this.selected[i] = false;
+    }
+
+    if (value instanceof String[]) {
+      String[] values = (String[]) value;
+
+      for (int i = 0; i < values.length; i++) {
+        for (int j = 0; j < this.options.length; j++) {
+          if (this.options[j].equals(values[i])) {
+            this.selected[j] = true;
+            break;
+          }
+        }
+      }
+    } else if (value instanceof String) {
+      String s = (String) value;
+
+      for (int i = 0; i < this.options.length; i++) {
+        if (this.options[i].equals(s)) {
+          this.selected[i] = true;
+          break;
+        }
+      }
+    }
+
+    updateValue();
+  }
+
+  Object getValue() {
+    return getSelectedValues();
+  }
+
+  String[] getSelectedValues() {
+    int count = 0;
+    for (int i = 0; i < this.selected.length; i++) {
+      if (this.selected[i]) count++;
+    }
+
+    String[] result = new String[count];
+    int index = 0;
+
+    for (int i = 0; i < this.selected.length; i++) {
+      if (this.selected[i]) {
+        result[index++] = this.options[i];
+      }
+    }
+
+    return result;
+  }
+
+  IntList getSelectedIndices() {
+    IntList indices = new IntList();
+
+    for (int i = 0; i < this.selected.length; i++) {
+      if (this.selected[i]) {
+        indices.append(i);
+      }
+    }
+
+    return indices;
+  }
+
+  boolean isSelected(int i) {
+    if (i < 0 || i >= this.selected.length) return false;
+    return this.selected[i];
+  }
+
+  void setSelected(int i, boolean state) {
+    if (i < 0 || i >= this.selected.length) return;
+    this.selected[i] = state;
+    updateValue();
+  }
+
+  void toggleSelected(int i) {
+    if (i < 0 || i >= this.selected.length) return;
+    this.selected[i] = !this.selected[i];
+    updateValue();
+  }
+
+  void clearSelections() {
+    for (int i = 0; i < this.selected.length; i++) {
+      this.selected[i] = false;
+    }
+    updateValue();
+  }
+
+  void selectAll() {
+    for (int i = 0; i < this.selected.length; i++) {
+      this.selected[i] = true;
+    }
+    updateValue();
+  }
+
+  void updateValue() {
+    this.value = getSelectedValues();
+  }
+
+  String getDisplayText() {
+    String[] values = getSelectedValues();
+
+    if (values.length == 0) return emptyDisplayText;
+
+    String result = "";
+    for (int i = 0; i < values.length; i++) {
+      result += values[i];
+      if (i < values.length - 1) result += ", ";
+    }
+
+    return result;
+  }
+
+  void mousePressed() {
+    if (!this.isVisible) return;
+
+    if (isOverClosedBox()) {
+      if (!this.isOpen) {
+        this.isOpen = true;
+        this.isActive = true;
+      }
+      return;
+    }
+
+    if (this.isOpen && isOverList()) {
+      int clickedIndex = getHoveredItemIndex();
+
+      if (clickedIndex != -1) {
+        toggleSelected(clickedIndex);
+        this.triggerCallback();
+      }
+
+      this.isActive = true;
+      return;
+    }
+
+    this.isOpen = false;
+    this.isActive = false;
+  }
+
+  void draw() {
+    if (!this.isVisible) return;
+
+    textAlign(LEFT);
+    textSize(16);
+
+    fill(0);
+    text(this.label, this.x, this.y - 10);
+
+    // main dropdown box
+    noStroke();
+    fill(this.isActive ? 220 : 255);
+    rect(this.x, this.y, this.w, this.h);
+
+    // selected values text
+    fill(0);
+    String selectedText = getDisplayText();
+
+    float maxTextWidth = this.w - 32;
+    while (textWidth(selectedText) > maxTextWidth && selectedText.length() > 3) {
+      selectedText = selectedText.substring(0, selectedText.length() - 4) + "...";
+    }
+
+    text(selectedText, this.x + 8, this.y + this.h * 0.65);
+
+    // dropdown arrow
+    float arrowX = this.x + this.w - 18;
+    float arrowY = this.y + this.h / 2.0;
+
+    fill(0);
+    if (this.isOpen) {
+      triangle(arrowX - 6, arrowY + 3, arrowX + 6, arrowY + 3, arrowX, arrowY - 4);
+    } else {
+      triangle(arrowX - 6, arrowY - 3, arrowX + 6, arrowY - 3, arrowX, arrowY + 4);
+    }
+
+    if (this.isOpen) {
+      drawList();
+    }
+  }
+
+  void drawList() {
+    int visibleCount = min(this.maxVisibleItems, this.options.length);
+    float listY = this.y + this.h;
+    float listH = visibleCount * this.itemHeight;
+
+    // list background
+    noStroke();
+    fill(255);
+    rect(this.x, listY, this.w, listH);
+
+    int hoveredIndex = getHoveredItemIndex();
+
+    for (int i = 0; i < visibleCount; i++) {
+      int optionIndex = this.scrollOffset + i;
+      if (optionIndex >= this.options.length) break;
+
+      float itemY = listY + i * this.itemHeight;
+
+      // hover highlight
+      if (optionIndex == hoveredIndex) {
+        fill(230);
+        noStroke();
+        rect(this.x, itemY, this.w, this.itemHeight);
+      }
+
+      // selection indicator circle
+      float circleX = this.x + 12;
+      float circleY = itemY + this.itemHeight * 0.5;
+      float circleSize = 10;
+
+      stroke(120);
+      strokeWeight(1);
+
+      if (this.selected[optionIndex]) {
+        fill(selectedCircleColor);
+      } else {
+        fill(255);
+      }
+      ellipse(circleX, circleY, circleSize, circleSize);
+
+      fill(0);
+      text(this.options[optionIndex], this.x + 24, itemY + this.itemHeight * 0.65);
+      
+      stroke(200);
+      line(this.x, itemY + this.itemHeight, this.x + this.w, itemY + this.itemHeight);
+    }
+
+    // scrollbar
+    if (this.options.length > this.maxVisibleItems) {
+      float barW = 8;
+      float trackX = this.x + this.w - barW - 2;
+      float trackY = listY + 2;
+      float trackH = listH - 4;
+
+      fill(240);
+      noStroke();
+      rect(trackX, trackY, barW, trackH);
+
+      float thumbH = max(20, trackH * ((float)this.maxVisibleItems / this.options.length));
+      float maxScroll = this.options.length - this.maxVisibleItems;
+      float thumbY = trackY;
+
+      if (maxScroll > 0) {
+        thumbY = trackY + (trackH - thumbH) * (this.scrollOffset / maxScroll);
+      }
+
+      fill(140);
+      rect(trackX, thumbY, barW, thumbH);
+    }
+
+    strokeWeight(1);
+    stroke(0);
   }
 }

@@ -40,7 +40,8 @@ class NavButton {
       fill(normalColor);      // Gray - normal 
     }
     
-    stroke(0);                 
+    stroke(0);    
+    strokeWeight(2);
     rect(x, y, w, h);         
     
     // Draw button text
@@ -74,7 +75,7 @@ class Navigation {
   Navigation(float startX, float buttonY, int buttonWidth, int buttonHeight) {
     this.startX = startX;
     this.buttons = new ArrayList<NavButton>();
-    this.currentScreen = 1;      // Start with search city screen (1)
+    this.currentScreen = 0;      // Start with search city screen (1)
     this.buttonY = buttonY;
     this.buttonWidth = buttonWidth;
     this.buttonHeight = buttonHeight;

@@ -38,9 +38,9 @@ void setup() {
   
   // Load CSV file
   table = loadTable("flights2k.csv", "header");
-  table2 = loadTable("flights10k.csv", "header");
-  table3 = loadTable("flights100k.csv", "header");
-  table4 = loadTable("flights_full.csv", "header");
+  //table2 = loadTable("flights10k.csv", "header");
+  //table3 = loadTable("flights100k.csv", "header");
+  //table4 = loadTable("flights_full.csv", "header");
 
   flightsData = new Flights(table);
   
@@ -97,6 +97,7 @@ void draw() {
   // Draw current screen
   switch (screenToRenderIndex) {
     case 0:
+      pieChartsScreen.update();
       pieChartsScreen.draw();
       break;
     case 1:

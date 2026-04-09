@@ -88,6 +88,19 @@ class Flights {
     return counts;
   }
   
+  HashMap<String, Integer> countByCancellationOrigin(ArrayList<Flight> flightList) {
+    HashMap<String, Integer> counts = new HashMap<String, Integer>();
+    
+    for (Flight flight: flightList) {
+      String key = flight.ORIGIN_CITY_NAME;
+      if (flight.CANCELLED) {
+        incrementCount(counts, key);
+      }
+    }
+    
+    return counts;
+  }
+  
   HashMap<String, Integer> countByDiversions(ArrayList<Flight> flightList) {
     HashMap<String, Integer> counts = new HashMap<String, Integer>();
     counts.put("Diverted", 0);
@@ -134,6 +147,26 @@ class Flights {
     });
     
     return sorted.get(0).DISTANCE;
+  }
+  
+  String[] getFlightCarriers(ArrayList<Flight> flightList) {
+    Set<String> carriers = new HashSet<>();
+    
+    for (Flight flight : flightList) {
+      carriers.add(flight.MKT_CARRIER);
+    }
+    
+    return carriers.toArray(new String[0]);
+  }
+  
+  String[] getAirports(ArrayList<Flight> flightList) {
+    Set<String> airports = new HashSet<>();
+    
+    for (Flight flight : flightList) {
+      airports.add(flight.ORIGIN);
+    }
+    
+    return airports.toArray(new String[0]);
   }
   
   
@@ -199,6 +232,12 @@ class Flights {
     return buildChartData(counts, sorted, 2);
   }
   
+  ChartData topNCancellationOrigins(ArrayList<Flight> flightList, int n) {
+    HashMap<String, Integer> counts = countByCancellationOrigin(flightList);
+    ArrayList<String> sorted = sortKeysDescending(counts);
+    return buildChartData(counts, sorted, n);
+  }
+  
   ChartData diversionData(ArrayList<Flight> flightList) {
     HashMap<String, Integer> counts = countByDiversions(flightList);
     ArrayList<String> sorted = sortKeysDescending(counts);
@@ -207,6 +246,30 @@ class Flights {
   
   
   // Helper functions
+  ArrayList<Flight> filterByCarrier(ArrayList<Flight> flightsList, String carrier) {
+    ArrayList<Flight> filtered = new ArrayList<Flight>();
+    
+    for (Flight flight : flightsList) {
+      if (flight.MKT_CARRIER.equals(carrier)) {
+        filtered.add(flight);
+      }
+    }
+    
+    return filtered;
+  }
+
+  ArrayList<Flight> filterByCarriers(ArrayList<Flight> flightsList, String[] carriers) {
+    ArrayList<Flight> filtered = new ArrayList<Flight>();
+    
+    for (Flight flight : flightsList) {
+      if (Arrays.asList(carriers).contains(flight.MKT_CARRIER)) {
+        filtered.add(flight);
+      }
+    }
+    
+    return filtered;
+  }
+  
   ArrayList<Flight> filterByDistance(ArrayList<Flight> flightsList, float minDistance, float maxDistance) {
     ArrayList<Flight> filtered = new ArrayList<Flight>();
     
