@@ -1,27 +1,25 @@
 //abdul bar chart screen
 class BarChartsScreen {
 
-  // Stores number of flights per airport
+  // Stores number of flights per airport 
   HashMap<String, Integer> flightCounts = new HashMap<String, Integer>();
 
-  // Stores total miles per airporrt
+  // Stores total miles per airport 
   HashMap<String, Float> mileCounts = new HashMap<String, Float>();
 
-   
+  // Lists used to store sorted airport codes
   ArrayList<String> sortedByFlights = new ArrayList<String>(); 
   ArrayList<String> sortedByMiles = new ArrayList<String>();
 
+  int topN = 10;    // show top 10 airports on chart
 
-  int topN = 10;    //show top10 
+  boolean showMiles = false; // false = show flights, true = show miles
 
-
-  boolean showMiles = false;
-
-  boolean draggingSlider = false;
+  boolean draggingSlider = false; // tracks if user is dragging slider
 
   int mode = 2; // 0 = incoming, 1 = outgoing, 2 = both
   
-  Flights flightsData;
+  Flights flightsData; // holds all flight data
 
   // colors for each bar 
   color[] barColors = {
@@ -37,7 +35,7 @@ class BarChartsScreen {
     color(192, 57, 43)
   };
 
-
+  // Constructor: runs when screen is created
   BarChartsScreen(Flights flightsData) {
     this.flightsData = flightsData;
     
@@ -45,13 +43,13 @@ class BarChartsScreen {
     rebuildSortedLists();    // sort results
   }
 
-  // Loops through all flights 
+  // Loops through all flights and counts data
   void countData() {
     flightCounts.clear();    // reset counts
     mileCounts.clear();
 
-    
-    if (flightsData == null || flightsData.flights == null) return;  //stop if cant read the flight data
+    // if cant read data it stops running
+    if (flightsData == null || flightsData.flights == null) return;
 
     for (Flight f : flightsData.flights) {
 
@@ -68,11 +66,10 @@ class BarChartsScreen {
         addMiles(f.ORIGIN, f.DISTANCE);
       } 
       else {
-        // Count flights for origin nd destination 
+        // both incoming and outgoing flights
         addFlight(f.ORIGIN);
         addFlight(f.DEST);
 
-        // Add distance for both airports
         addMiles(f.ORIGIN, f.DISTANCE);
         addMiles(f.DEST, f.DISTANCE);
       }
@@ -83,25 +80,29 @@ class BarChartsScreen {
   void addFlight(String airport) {
     if (airport == null || airport.equals("")) return;
 
+    // if airport already exists increase count
     if (flightCounts.containsKey(airport)) {
       flightCounts.put(airport, flightCounts.get(airport) + 1);
     } else {
+      // otherwise start count at 1
       flightCounts.put(airport, 1);
     }
   }
 
-  // Adds distance
+  // Adds distance to an airport
   void addMiles(String airport, float dist) {
     if (airport == null || airport.equals("")) return;
 
+    // if airport exists add distance
     if (mileCounts.containsKey(airport)) {
       mileCounts.put(airport, mileCounts.get(airport) + dist);
     } else {
+      // otherwise set initial distance
       mileCounts.put(airport, dist);
     }
   }
 
-  // Sorts airports from highestto lowest
+  // Sorts airports from highest to lowest
   void rebuildSortedLists() {
 
     // Sort by number of flights
@@ -121,7 +122,7 @@ class BarChartsScreen {
     });
   }
 
-  // Returns correct list 
+  // Returns correct list depending on mode (flights or miles)
   ArrayList<String> getCurrentSortedAirports() {
     if (showMiles) {
       return sortedByMiles;
@@ -130,7 +131,7 @@ class BarChartsScreen {
     }
   }
 
-  // Main draw function
+  // Main draw function 
   void draw() {
     ArrayList<String> airports = getCurrentSortedAirports();
 
@@ -147,7 +148,7 @@ class BarChartsScreen {
     int barWidth = 45;
     int spacing = 18;
 
-    // Find max valeu 
+    // Find max value for scaling bars
     float maxVal = 0;
     for (int i = 0; i < barsToDraw; i++) {
       String airport = airports.get(i);
@@ -160,6 +161,7 @@ class BarChartsScreen {
       if (v > maxVal) maxVal = v;
     }
 
+    // If no data, display message
     if (maxVal <= 0) {
       textSize(18);
       text("No data available", width / 2, height / 2);
@@ -179,13 +181,13 @@ class BarChartsScreen {
     line(margin, chartBottom, width - 100, chartBottom); // x-axis
     line(margin, chartBottom, margin, chartTop);         // y-axis
 
-    // X-axi
+    // xaxis label
     fill(0);
     textSize(14);
     text("Airports", width / 2, height - 50);
 
-    // Y-axis 
-    pushMatrix();
+    // yaxis label 
+    pushMatrix();  //coord
     translate(35, height / 2);
     rotate(-HALF_PI);
     if (showMiles) {
@@ -208,12 +210,13 @@ class BarChartsScreen {
         value = flightCounts.get(airport);
       }
 
+      // convert data to fit scale for bar
       float barHeight = map(value, 0, maxVal, 0, chartHeight);
 
       int x = margin + i * (barWidth + spacing);
       int y = chartBottom;
 
-      // diff colour diff bar
+      // draw bar
       fill(barColors[i % barColors.length]);
       noStroke();
       rect(x, y - barHeight, barWidth, barHeight);
@@ -224,23 +227,28 @@ class BarChartsScreen {
       text(nf(value, 0, 0), x + barWidth / 2, y - barHeight - 10); 
     }
 
-    drawControls();
+    drawControls(); 
   }
 
+  // drawcontrols
   void drawControls() {
     fill(0);
     textAlign(LEFT, CENTER);
     textSize(14);
 
+    // slider label
     text("Top Airports: " + topN, 700, 100);
 
+    // slider line
     stroke(0);
     line(700, 120, 900, 120);
 
+    // slider handle
     float knobX = map(topN, 1, 10, 700, 900);
     fill(255);
     ellipse(knobX, 120, 15, 15);
 
+    // current mode display
     fill(0);
     if (showMiles) {
       text("Mode: Miles", 700, 180);
@@ -248,7 +256,7 @@ class BarChartsScreen {
       text("Mode: Flights", 700, 180);
     }
 
-    // Toggle button
+    // toggle button
     fill(0);
     rect(700, 200, 200, 30);
 
@@ -259,8 +267,6 @@ class BarChartsScreen {
     } else {
       text("Switch to Miles", 800, 215);
     }
-
-    // separate buttons for incoming outgoing both
 
     // Incoming button
     fill(0);
@@ -281,35 +287,37 @@ class BarChartsScreen {
     text("Incoming + Outgoing", 800, 345);
   }
 
+  // Handle mouse clicks
   void mousePressed() {
 
-    // Start dragging slider
+    // slider click
     if (mouseX > 700 && mouseX < 900 && mouseY > 110 && mouseY < 130) {
       draggingSlider = true;
       updateTopNFromMouse();
     }
 
-    // Toggle between modes
+    // toggle miles/flights
     if (mouseX > 700 && mouseX < 900 && mouseY > 200 && mouseY < 230) {
       showMiles = !showMiles;
     }
 
-    // button clicks for each mode
-
+    // incoming button
     if (mouseX > 700 && mouseX < 900 && mouseY > 250 && mouseY < 280) {
-      mode = 0; // incoming
+      mode = 0;
       countData();
       rebuildSortedLists();
     }
 
+    // outgoing button
     if (mouseX > 700 && mouseX < 900 && mouseY > 290 && mouseY < 320) {
-      mode = 1; // outgoing
+      mode = 1;
       countData();
       rebuildSortedLists();
     }
 
+    // both button
     if (mouseX > 700 && mouseX < 900 && mouseY > 330 && mouseY < 360) {
-      mode = 2; // both
+      mode = 2;
       countData();
       rebuildSortedLists();
     }
@@ -325,11 +333,13 @@ class BarChartsScreen {
     draggingSlider = false;
   }
 
+  // updates slider value 
   void updateTopNFromMouse() {
     topN = int(map(mouseX, 700, 900, 1, 10));
     topN = constrain(topN, 1, 10);
   }
-
-  void keyPressed() { }
-  void mouseWheel(MouseEvent event) { }
-}
+ 
+ //empty palceholder
+ void keyPressed() { } 
+ void mouseWheel(MouseEvent event) { } 
+ }
