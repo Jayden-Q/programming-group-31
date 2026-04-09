@@ -8,16 +8,18 @@ class BarChartsScreen {
   HashMap<String, Float> mileCounts = new HashMap<String, Float>();
 
    
-  ArrayList<String> sortedByFlights = new ArrayList<String>();
+  ArrayList<String> sortedByFlights = new ArrayList<String>(); 
   ArrayList<String> sortedByMiles = new ArrayList<String>();
 
 
-  int topN = 10;
+  int topN = 10;    //show top10 
 
 
   boolean showMiles = false;
 
   boolean draggingSlider = false;
+
+  int mode = 2; // 0 = incoming, 1 = outgoing, 2 = both
   
   Flights flightsData;
 
@@ -49,17 +51,31 @@ class BarChartsScreen {
     mileCounts.clear();
 
     
-    if (flightsData == null || flightsData.flights == null) return;
+    if (flightsData == null || flightsData.flights == null) return;  //stop if cant read the flight data
 
     for (Flight f : flightsData.flights) {
 
-      // Count flights for origin nd destination
-      addFlight(f.ORIGIN);
-      addFlight(f.DEST);
+      // mode controls what data we count
 
-      // Add distance for both airports
-      addMiles(f.ORIGIN, f.DISTANCE);
-      addMiles(f.DEST, f.DISTANCE);
+      if (mode == 0) {
+        // incoming flights only (destination airport)
+        addFlight(f.DEST);
+        addMiles(f.DEST, f.DISTANCE);
+      } 
+      else if (mode == 1) {
+        // outgoing flights only (origin airport)
+        addFlight(f.ORIGIN);
+        addMiles(f.ORIGIN, f.DISTANCE);
+      } 
+      else {
+        // Count flights for origin nd destination 
+        addFlight(f.ORIGIN);
+        addFlight(f.DEST);
+
+        // Add distance for both airports
+        addMiles(f.ORIGIN, f.DISTANCE);
+        addMiles(f.DEST, f.DISTANCE);
+      }
     }
   }
 
@@ -107,7 +123,11 @@ class BarChartsScreen {
 
   // Returns correct list 
   ArrayList<String> getCurrentSortedAirports() {
-    return showMiles ? sortedByMiles : sortedByFlights;
+    if (showMiles) {
+      return sortedByMiles;
+    } else {
+      return sortedByFlights;
+    }
   }
 
   // Main draw function
@@ -116,8 +136,6 @@ class BarChartsScreen {
 
     fill(0);
     textAlign(CENTER, CENTER);
-
-  
 
     // Chart layout values
     int margin = 100;
@@ -133,11 +151,15 @@ class BarChartsScreen {
     float maxVal = 0;
     for (int i = 0; i < barsToDraw; i++) {
       String airport = airports.get(i);
-      float v = showMiles ? mileCounts.get(airport) : flightCounts.get(airport);
+      float v;
+      if (showMiles) {
+        v = mileCounts.get(airport);
+      } else {
+        v = flightCounts.get(airport);
+      }
       if (v > maxVal) maxVal = v;
     }
 
-  
     if (maxVal <= 0) {
       textSize(18);
       text("No data available", width / 2, height / 2);
@@ -146,10 +168,11 @@ class BarChartsScreen {
 
     // Title
     textSize(22);
-    text(
-      showMiles ? "Airports with Most Flight Miles (In + Out)" : "Airports with Most Flights (In + Out)",
-      width / 2, 50
-    );
+    if (showMiles) {
+      text("Airports with Most Flight Miles", width / 2, 50);
+    } else {
+      text("Airports with Most Flights", width / 2, 50);
+    }
 
     // Axes
     stroke(0);
@@ -165,7 +188,11 @@ class BarChartsScreen {
     pushMatrix();
     translate(35, height / 2);
     rotate(-HALF_PI);
-    text(showMiles ? "Total Miles" : "Number of Flights", 0, 0);
+    if (showMiles) {
+      text("Total Miles", 0, 0);
+    } else {
+      text("Number of Flights", 0, 0);
+    }
     popMatrix();
 
     textSize(12);
@@ -174,10 +201,13 @@ class BarChartsScreen {
     for (int i = 0; i < barsToDraw; i++) {
       String airport = airports.get(i);
     
-   
-      float value = showMiles ? mileCounts.get(airport) : flightCounts.get(airport);
+      float value;
+      if (showMiles) {
+        value = mileCounts.get(airport);
+      } else {
+        value = flightCounts.get(airport);
+      }
 
-     
       float barHeight = map(value, 0, maxVal, 0, chartHeight);
 
       int x = margin + i * (barWidth + spacing);
@@ -190,34 +220,33 @@ class BarChartsScreen {
 
       // Labels
       fill(0);
-      text(airport, x + barWidth / 2, y + 15);                 // airport code
-      text(nf(value, 0, 0), x + barWidth / 2, y - barHeight - 10); // value
+      text(airport, x + barWidth / 2, y + 15);                 
+      text(nf(value, 0, 0), x + barWidth / 2, y - barHeight - 10); 
     }
 
-    
     drawControls();
   }
 
- 
   void drawControls() {
     fill(0);
     textAlign(LEFT, CENTER);
     textSize(14);
 
-   
     text("Top Airports: " + topN, 700, 100);
 
-   
     stroke(0);
     line(700, 120, 900, 120);
 
-    
     float knobX = map(topN, 1, 10, 700, 900);
     fill(255);
     ellipse(knobX, 120, 15, 15);
 
     fill(0);
-    text("Mode: " + (showMiles ? "Miles" : "Flights"), 700, 180);
+    if (showMiles) {
+      text("Mode: Miles", 700, 180);
+    } else {
+      text("Mode: Flights", 700, 180);
+    }
 
     // Toggle button
     fill(0);
@@ -225,7 +254,31 @@ class BarChartsScreen {
 
     fill(255);
     textAlign(CENTER, CENTER);
-    text(showMiles ? "Switch to Flights" : "Switch to Miles", 800, 215);
+    if (showMiles) {
+      text("Switch to Flights", 800, 215);
+    } else {
+      text("Switch to Miles", 800, 215);
+    }
+
+    // separate buttons for incoming outgoing both
+
+    // Incoming button
+    fill(0);
+    rect(700, 250, 200, 30);
+    fill(255);
+    text("Incoming", 800, 265);
+
+    // Outgoing button
+    fill(0);
+    rect(700, 290, 200, 30);
+    fill(255);
+    text("Outgoing", 800, 305);
+
+    // Both button
+    fill(0);
+    rect(700, 330, 200, 30);
+    fill(255);
+    text("Incoming + Outgoing", 800, 345);
   }
 
   void mousePressed() {
@@ -240,9 +293,28 @@ class BarChartsScreen {
     if (mouseX > 700 && mouseX < 900 && mouseY > 200 && mouseY < 230) {
       showMiles = !showMiles;
     }
+
+    // button clicks for each mode
+
+    if (mouseX > 700 && mouseX < 900 && mouseY > 250 && mouseY < 280) {
+      mode = 0; // incoming
+      countData();
+      rebuildSortedLists();
+    }
+
+    if (mouseX > 700 && mouseX < 900 && mouseY > 290 && mouseY < 320) {
+      mode = 1; // outgoing
+      countData();
+      rebuildSortedLists();
+    }
+
+    if (mouseX > 700 && mouseX < 900 && mouseY > 330 && mouseY < 360) {
+      mode = 2; // both
+      countData();
+      rebuildSortedLists();
+    }
   }
 
-  // Update slider while movin
   void mouseDragged() {
     if (draggingSlider) {
       updateTopNFromMouse();
