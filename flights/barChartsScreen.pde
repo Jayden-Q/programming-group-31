@@ -1,37 +1,33 @@
 //abdul bar chart screen
 class BarChartsScreen {
   
-  //I created a class called barchartsscreen to handle the data processing etc
-  //To store data Used 2 hash maps. Each airport code is the key and the value is either flight or distance
-  //To process data, (count data function loops through all flights and update hash map )i implemented a mode system - 0 incoming flights using dest 1 origin 2 both Allows us to see analyse traffic both ways
-  //Sorting - stored airpot codes in array list and sorted using collection.sort and using comparator filter by miles etc
-  //Draw the chart- setup colours, margins and used loop to draw each bar using rect(). Used map function to fit proportional scale
-  //Added axes using line() and text()
-  //Implemented a slider to allow user how many airport displayed. Used contrain() to keep within the valid limits
-  //Toggle between flights and miles using boolean showmiles
-  //Added diff colours and text labels for user experience 
+  //created a class called barchartsscreen to handle the data processing etc
+
   // Stores number of flights per airport 
-  
+  //To store data Used 2 hash maps. Each airport code is the key and the value is flight or dist
   HashMap<String, Integer> flightCounts = new HashMap<String, Integer>();
 
   // Stores total miles per airport 
   HashMap<String, Float> mileCounts = new HashMap<String, Float>();
 
   // Lists used to store sorted airport codes
+  //Sorting - stored airpot codes in array list and sorted using collection.sort and using comparator filter by highest to lowest
   ArrayList<String> sortedByFlights = new ArrayList<String>(); 
   ArrayList<String> sortedByMiles = new ArrayList<String>();
 
   int topN = 10;    // show top 10 airports on chart
 
-  boolean showMiles = false; // false = show flights, true = show miles
+  boolean showMiles = false; //Toggle between flights and miles using boolean -showmiles
 
   boolean draggingSlider = false; // tracks if user is dragging slider
 
   int mode = 2; // 0 = incoming, 1 = outgoing, 2 = both
+  //To process data, (the count data function loops through all flights and update hash map )i implemented a mode system - 0 incoming flights-dest 1 origin 2 both Allows us to see analyse traffic both ways
   
   Flights flightsData; // holds all flight data
 
   // colors for each bar 
+  //Added diff colours to bars and labels for clarity
   color[] barColors = {
     color(231, 76, 60),
     color(52, 152, 219),
@@ -142,6 +138,7 @@ class BarChartsScreen {
   }
 
   // Main draw function 
+  //Draw the chart- setup colours, margins and used loop to draw each bar using rect(). Used map function to fit the bars proportional
   void draw() {
     ArrayList<String> airports = getCurrentSortedAirports();
 
@@ -187,9 +184,10 @@ class BarChartsScreen {
     }
 
     // Axes
+    //Added x axe using line() and text() for y i used pushmatrix translate and roate to roate the text vertically
     stroke(0);
-    line(margin, chartBottom, width - 100, chartBottom); // x-axis
-    line(margin, chartBottom, margin, chartTop);         // y-axis
+    line(margin, chartBottom, width - 100, chartBottom); 
+    line(margin, chartBottom, margin, chartTop);         
 
     // xaxis label
     fill(0);
@@ -197,7 +195,7 @@ class BarChartsScreen {
     text("Airports", width / 2, height - 50);
 
     // yaxis label 
-    pushMatrix();  //coord
+    pushMatrix();  
     translate(35, height / 2);
     rotate(-HALF_PI);
     if (showMiles) {
@@ -241,24 +239,22 @@ class BarChartsScreen {
   }
 
   // drawcontrols
+  //Implemented a slider using mouseX and map() func to allow user how many airport displayed. Used contrain() to keep within the valid limits
+  //added buttons to filter flights. each button sets mode variable, when clicked rebuildsortedlist func and count data func updates chart
   void drawControls() {
     fill(0);
     textAlign(LEFT, CENTER);
     textSize(14);
 
-    // slider label
     text("Top Airports: " + topN, 700, 100);
 
-    // slider line
     stroke(0);
     line(700, 120, 900, 120);
 
-    // slider handle
     float knobX = map(topN, 1, 10, 700, 900);
     fill(255);
     ellipse(knobX, 120, 15, 15);
 
-    // current mode display
     fill(0);
     if (showMiles) {
       text("Mode: Miles", 700, 180);
@@ -266,7 +262,6 @@ class BarChartsScreen {
       text("Mode: Flights", 700, 180);
     }
 
-    // toggle button
     fill(0);
     rect(700, 200, 200, 30);
 
@@ -278,19 +273,16 @@ class BarChartsScreen {
       text("Switch to Miles", 800, 215);
     }
 
-    // Incoming button
     fill(0);
     rect(700, 250, 200, 30);
     fill(255);
     text("Incoming", 800, 265);
 
-    // Outgoing button
     fill(0);
     rect(700, 290, 200, 30);
     fill(255);
     text("Outgoing", 800, 305);
 
-    // Both button
     fill(0);
     rect(700, 330, 200, 30);
     fill(255);
@@ -298,34 +290,30 @@ class BarChartsScreen {
   }
 
   // Handle mouse clicks
+  //for user interaction , mouse pressed for clicks, mousedragged for slider and mouserelease to stop dragging
   void mousePressed() {
 
-    // slider click
     if (mouseX > 700 && mouseX < 900 && mouseY > 110 && mouseY < 130) {
       draggingSlider = true;
       updateTopNFromMouse();
     }
 
-    // toggle miles/flights
     if (mouseX > 700 && mouseX < 900 && mouseY > 200 && mouseY < 230) {
       showMiles = !showMiles;
     }
 
-    // incoming button
     if (mouseX > 700 && mouseX < 900 && mouseY > 250 && mouseY < 280) {
       mode = 0;
       countData();
       rebuildSortedLists();
     }
 
-    // outgoing button
     if (mouseX > 700 && mouseX < 900 && mouseY > 290 && mouseY < 320) {
       mode = 1;
       countData();
       rebuildSortedLists();
     }
 
-    // both button
     if (mouseX > 700 && mouseX < 900 && mouseY > 330 && mouseY < 360) {
       mode = 2;
       countData();
@@ -343,13 +331,12 @@ class BarChartsScreen {
     draggingSlider = false;
   }
 
-  // updates slider value 
   void updateTopNFromMouse() {
     topN = int(map(mouseX, 700, 900, 1, 10));
     topN = constrain(topN, 1, 10);
   }
  
- //empty palceholder
+ //palceholder
  void keyPressed() { } 
  void mouseWheel(MouseEvent event) { } 
- }
+}
