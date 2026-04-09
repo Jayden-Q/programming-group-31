@@ -1,4 +1,4 @@
-//abdul bar chart screen
+//abdul barchart screen (full)
 class BarChartsScreen {
   
   //created a class called barchartsscreen to handle the data processing etc
