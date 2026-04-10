@@ -1,3 +1,4 @@
+//02/04/2026 Xianren - added initial skeleton functions for screen switch feature
 //abdul barchart screen (full)
 class BarChartsScreen {
   
