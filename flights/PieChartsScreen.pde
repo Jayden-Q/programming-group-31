@@ -1,5 +1,6 @@
 // 24/03/26: Jayden, Pie Charts Screen
- //02/04/2026 Xianren - added initial skeleton functions to handle switching screens 
+//02/04/2026 Xianren - added initial skeleton functions to handle switching screens 
+//02/04/2026 Xianren - removed background in draw function to make sure only one screen shows up at a time
 class PieChartsScreen {
   LinkedHashMap<String, PieChart> pieCharts = new LinkedHashMap<String, PieChart>();
   LinkedHashMap<String, Input> inputs = new LinkedHashMap<String, Input>();
