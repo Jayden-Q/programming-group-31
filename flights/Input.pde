@@ -681,7 +681,7 @@ class Dropdown extends Input {
 
 
 
-//26/03/2026 Xianren - text input extension for searching
+//26/03/2026 Xianren - text input extension for input and exiting the search box
 // TextInput 
 class TextInput extends Input {
   TextInput(String label, float x, float y, float w, float h) {
