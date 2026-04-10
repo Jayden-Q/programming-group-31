@@ -9,6 +9,7 @@ class ChartData {
   } 
 }
 
+// Used for metrics/additional information for the charts
 class Text {
   String text;
   
@@ -26,6 +27,7 @@ class Chart {
   float x, y;
   float w, h;
   
+  // Stores all text so it can be accessed later
   HashMap<String, Text> texts = new HashMap<String, Text>();
   
   Chart(String title, float x, float y, float w, float h) {
@@ -40,6 +42,7 @@ class Chart {
     this.texts.put(id, new Text(text, x, y));
   }
   
+  // Change the text content by ID
   void updateText(String id, String text) {
     Text t = this.texts.get(id);
     if (t != null) {
@@ -47,12 +50,14 @@ class Chart {
     }
   }
   
+  // Get the content of a Text by ID
   String getText(String id) {
     return this.texts.get(id).text;
   }
   
   void update() {}
   
+  // Draws all the text
   void draw() {
     fill(0);
     textSize(16);
@@ -65,18 +70,20 @@ class Chart {
 class PieChart extends Chart {
   String[] labels;
   float[] values;
-  color[] colours;
+  color[] colours; // Colour for each slice
  
-  float total;
+  float total; // total of all values in the chart
   
   String[] displayLabels;
   float[] displayValues;
   color[] displayColours;
   float displayTotal;
   
+  // Values to draw the pie chart slices to maintain ideal sizes (slices can't be too small or too big)
   float[] visualValues;
   float visualTotal;
   
+  // Settings for controlling the chart's behaviour
   boolean groupSmallSlicesIntoOther = true;
   int maxSlices = 6;
   String otherLabel = "Other";
@@ -94,6 +101,7 @@ class PieChart extends Chart {
     update();
   }
   
+  // Replaces the chart data and updates everything
   void setData(String[] labels, float[] values) {
     this.labels = labels;
     this.values = values;
@@ -106,16 +114,19 @@ class PieChart extends Chart {
     update();
   }
   
+  // Sets the maximum number of visible slices before the smallest slices compress to form "Other"
   void setMaxSlices(int maxSlices) {
     this.maxSlices = max(1, maxSlices);
     update();
   }
   
+  // Sets whether to draw the data ascending or descending
   void setReverse(boolean reverse) {
     this.reverseOrder = reverse;
     update();
   }
   
+  // Sets the max percent size of the pie chart a slice can take up
   void setMaxVisualPercent(float percent) {
     this.maxVisualPercent = constrain(percent, 0.1, 100);
     this.limitVisualSlicePercent = true;
@@ -127,6 +138,7 @@ class PieChart extends Chart {
     update();
   }
   
+  // Creates repeating colour palette for pie chart slices
   void generateColours() {
     color[] palette = {
       #3498D8,
@@ -138,7 +150,7 @@ class PieChart extends Chart {
       #E74C3C,
       #95A5A6
     };
-    
+  
     for (int i = 0; i < this.colours.length; i++) {
       this.colours[i] = palette[i % palette.length];
     }
@@ -156,6 +168,7 @@ class PieChart extends Chart {
   }
   
   void buildDisplayData() {
+    // Failsafe that creates empty arrays if the data is not valid
     if (this.labels == null || this.values == null || this.labels.length == 0) {
       this.displayLabels = new String[0];
       this.displayValues = new float[0];
@@ -166,11 +179,13 @@ class PieChart extends Chart {
     
     int n = min(this.labels.length, this.values.length);
     
+    // Calculate total of display values
     this.displayTotal = 0;
     for (int i = 0; i < n; i++) {
       if (this.values[i] > 0) this.displayTotal += this.values[i];
     }
     
+    // If the number of slices < maxSlices, then draw the pie chart normally
     if (!this.groupSmallSlicesIntoOther || n <= this.maxSlices) {
       this.displayLabels = new String[n];
       this.displayValues = new float[n];
@@ -186,6 +201,7 @@ class PieChart extends Chart {
     
     int[] sorted = sortIndicesByValueDesc(this.values, n);
     
+    // Keep maxSlices = -1 to save one for "Other"
     int keepCount = max(1, this.maxSlices - 1);
     keepCount = min(keepCount, n);
     
@@ -197,6 +213,7 @@ class PieChart extends Chart {
     float otherTotal = 0;
     
     if (!reverseOrder) {
+      // Keep largest slices individually
       for (int i = 0; i < keepCount; i++) {
         int idx = sorted[i];
         this.displayLabels[i] = this.labels[idx];
@@ -204,6 +221,7 @@ class PieChart extends Chart {
         this.displayColours[i] = this.colours[idx % this.colours.length];
       }
       
+      // Add smaller slices into "Other"
       for (int i = keepCount; i < n; i++) {
         int idx = sorted[i];
         otherTotal += this.values[idx];
@@ -222,10 +240,12 @@ class PieChart extends Chart {
       }
     }
     
+    // Add the "Other" slice
     this.displayLabels[keepCount] = this.otherLabel;
     this.displayValues[keepCount] = otherTotal;
     this.displayColours[keepCount] = color(180);
     
+    // If the "Other" slice has no value then remove it
     if (otherTotal <= 0) {
       this.displayLabels = subset(this.displayLabels, 0, keepCount);
       this.displayValues = subset(this.displayValues, 0, keepCount);
@@ -233,6 +253,7 @@ class PieChart extends Chart {
     }
   }
   
+  // Values used will only be for specifically drawing the chart
   void buildVisualData() {
     if (this.displayValues == null || this.displayValues.length == 0 || this.displayTotal <= 0) {
       this.visualValues = new float[0];
@@ -252,6 +273,7 @@ class PieChart extends Chart {
       return;
     }
     
+    // Calculate each slice's original share
     float cap = this.maxVisualPercent / 100.0;
     float[] baseShares = new float[n];
     float[] resultShares = new float[n];
@@ -268,6 +290,7 @@ class PieChart extends Chart {
     
     float assigned = 0;
     
+    // Loop until all slices have been assigned a final share
     while (activeCount > 0) {
       float activeBaseTotal = 0;
       for (int i = 0; i < n; i++) {
@@ -310,6 +333,7 @@ class PieChart extends Chart {
     }
   }
   
+  // Helper methods
   int[] sortIndicesByValueDesc(float[] arr, int count) {
     int[] indices = new int[count];
     int[] temp = new int[count];
@@ -358,6 +382,7 @@ class PieChart extends Chart {
   }
   
   void draw() {
+    // Show "No data" if there is the data is not valid
     if (this.displayValues == null || this.displayValues.length == 0 || this.displayTotal <= 0 || this.visualValues == null || this.visualValues.length == 0 || this.visualTotal <= 0) {
       fill(0);
       textAlign(CENTER);
@@ -367,8 +392,10 @@ class PieChart extends Chart {
       return;
     };
     
+    // Draw the metrics text
     super.draw();
     
+    // Pie chart values
     float cx = this.x + this.w / 2.0;
     float cy = this.y + this.h / 2.0;
     float diameter = min(this.w, this.h);

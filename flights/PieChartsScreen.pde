@@ -3,18 +3,23 @@ class PieChartsScreen {
   LinkedHashMap<String, PieChart> pieCharts = new LinkedHashMap<String, PieChart>();
   LinkedHashMap<String, Input> inputs = new LinkedHashMap<String, Input>();
   
+  // Carousel element, used for switching pie charts
   Carousel carousel;
   
+  // Flights data
   Flights flightsData;
   
   PieChartsScreen(Flights flightsData) {
     this.flightsData = flightsData;
     
+    // CREATE PIE CHARTS
+    // 1. Most flights
     Chart mostFlightsChart = createChart("mostFlights", "Airports with Most Flights (Departures)", 200, 150, 600, 600, flightsData.topNOrigins(flightsData.flights, 5));
     mostFlightsChart.addText(950, 600, "Total flights: ", "totalFlights");
     mostFlightsChart.addText(950, 640, "Airport with most flights: ", "mostFlights");
     mostFlightsChart.addText(950, 680, "Average flights per airport: ", "averageFlights");
     
+    // 2. Least flights
     PieChart leastFlightsChart = createChart("leastFlights", "Airports with Least Flights (Departures)", 200, 150, 600, 600, flightsData.bottomNOrigins(flightsData.flights, 5));
     leastFlightsChart.setReverse(true);
     leastFlightsChart.setMaxVisualPercent(70);
@@ -22,15 +27,19 @@ class PieChartsScreen {
     leastFlightsChart.addText(950, 640, "Airport with least flights: ", "leastFlights");
     leastFlightsChart.addText(950, 680, "Average flights per airport: ", "averageFlights");
     
+    // 3. Flight cancellations
     Chart flightCancellationChart = createChart("flightCancellations", "Flight Cancellations", 200, 150, 600, 600, flightsData.cancellationData(flightsData.flights));
     flightCancellationChart.addText(950, 600, "Highest cancellation airport: ", "highestCancellation");
     flightCancellationChart.addText(950, 640, "Lowest cancellation airport", "lowestCancellation");
     
+    // 4. Top carriers
     PieChart topCarriersChart = createChart("topCarriers", "Carriers with Most Flights", 200, 150, 600, 600, flightsData.topNCarriers(flightsData.flights, 5));
     topCarriersChart.setMaxSlices(8);
     
+    // Initialize carousel
     this.carousel = new Carousel(200, 150, 600, 600);
     
+    // Add all pie charts to the carousel
     for (Chart chart : this.pieCharts.values()) {
       this.carousel.addSlide(chart);
     }
@@ -38,8 +47,10 @@ class PieChartsScreen {
     ////////////
     // SLIDER //
     ////////////
+    
+    // Slider to control how many airports to show (number of slices in pie chart)
     Slider airportsToShowSlider = new Slider(950, 200, 400, 20, "Airports to show", 1, flightsData.getAirports(flightsData.flights).length - 1);
-    airportsToShowSlider.setValue(5);
+    airportsToShowSlider.setValue(5); // Default value
     airportsToShowSlider.setUnit(" airports");
     airportsToShowSlider.setDataType(Input.TYPE_INT);
     
@@ -51,11 +62,13 @@ class PieChartsScreen {
       }
     });
     
+    // Number of slices in the pie chart to add (slider is only visible when the carousel is displaying the topCarriers pie chart)
     Slider sectionsSlider = new Slider(950, 200, 400, 20, "Sections to show", 1, 10);
     sectionsSlider.setValue(5);
     sectionsSlider.setUnit(" sections");
     sectionsSlider.setDataType(Input.TYPE_INT);
     
+    // onChange()
     sectionsSlider.onChange(new Callback() {
       @Override
       public void call() {
@@ -67,13 +80,16 @@ class PieChartsScreen {
     //////////////////
     // Range Slider //
     //////////////////
+    
+    // Multi handle slider to filter the distance of flights
     RangeSlider distanceSlider = new RangeSlider(950, 300, 400, 20, "Distance",
       flightsData.getMinDistance(flightsData.flights), flightsData.getMaxDistance(flightsData.flights));
-    distanceSlider.setUnit("mi");
+    distanceSlider.setUnit("mi"); // Default unit is miles
     distanceSlider.setLowValue(flightsData.getMinDistance(flightsData.flights));
     distanceSlider.setHighValue(flightsData.getMaxDistance(flightsData.flights));
     distanceSlider.setDataType(Input.TYPE_INT);
     
+    // onChange()
     distanceSlider.onChange(new Callback() {
       @Override
       public void call() {
@@ -81,10 +97,14 @@ class PieChartsScreen {
       }
     });
     
-    String[] carriers = flightsData.getFlightCarriers(flightsData.flights);    
+    ///////////////////////////
+    // Multi-Select Dropdown //
+    ///////////////////////////
+    String[] carriers = flightsData.getFlightCarriers(flightsData.flights); // Get a list of all unique carriers
     MultiSelectDropdown carrierDropdown = new MultiSelectDropdown(950, 400, 220, 30, "Carriers", carriers);
     carrierDropdown.setMaxVisibleItems(5);
     
+    // onChange()
     carrierDropdown.onChange(new Callback() {
       @Override
       public void call() {
@@ -92,6 +112,7 @@ class PieChartsScreen {
       }
     });
     
+    // Button to clear all selected values in the carrier multi-select dropdown
     Button resetCarriersDropdownBtn = new Button(1180, 400, 80, 30, "Reset");
     resetCarriersDropdownBtn.onChange(new Callback() {
       @Override
@@ -101,7 +122,7 @@ class PieChartsScreen {
       }
     });
     
-    // Add all inputs to hashmap
+    // Add all inputs to hashmap to access easily later
     this.inputs.put("airportsToShowSlider", airportsToShowSlider);
     this.inputs.put("distanceSlider", distanceSlider);
     this.inputs.put("carrierDropdown", carrierDropdown);
@@ -111,6 +132,7 @@ class PieChartsScreen {
     updateCharts();
   }
   
+  // Method for creating pie charts
   PieChart createChart(String name, String title, float x, float y, float w, float h, ChartData data) {
     PieChart chart = new PieChart(title, x, y, w, h, data.labels, data.values);
     chart.setMaxSlices(10);
@@ -118,12 +140,15 @@ class PieChartsScreen {
     return chart;
   }
   
+  // Called in onChange() / when user input event occurs
   void updateCharts() {
+    // Retrieve all inputs from hashmap
     Slider airportsToShowSlider = (Slider) this.inputs.get("airportsToShowSlider");
     Dropdown carrierDropdown = (Dropdown) this.inputs.get("carrierDropdown");
     RangeSlider distanceSlider = (RangeSlider) this.inputs.get("distanceSlider");
     Slider sectionsToShowSlider = (Slider) this.inputs.get("sectionsSlider");
     
+    // Variables
     int airportsToShow = constrain((int) airportsToShowSlider.value, (int)airportsToShowSlider.minV, (int)airportsToShowSlider.maxV);
     airportsToShowSlider.setValue(airportsToShow);
     
@@ -135,6 +160,7 @@ class PieChartsScreen {
     
     String[] carriers = (String[]) carrierDropdown.getValue();
     
+    // Filter the data with the user inputs
     ArrayList<Flight> filteredFlights = flightsData.flights;
     
     if (carriers.length != 0) {
@@ -142,6 +168,7 @@ class PieChartsScreen {
     }
     filteredFlights = flightsData.filterByDistance(filteredFlights, minDistance, maxDistance);
         
+    // Update the pie charts with the new filtered data
     ChartData topOriginsData = flightsData.topNOrigins(filteredFlights, airportsToShow);
     pieCharts.get("mostFlights").setData(topOriginsData.labels, topOriginsData.values);
     
@@ -204,12 +231,14 @@ class PieChartsScreen {
     }
   }
   
+  // Method to set all inputs to visible/not visible to avoid inputs being triggered when they are not visible on screen
   void setVisibility(boolean isVisible) {
     for (Input input: this.inputs.values()) {
       input.isVisible = isVisible;      
     }
   }
   
+  // Update method to display which slide on the carousel to render
   void update() {
     switch (this.carousel.selectedIndex) {
       case 2:
@@ -237,6 +266,7 @@ class PieChartsScreen {
     for (Input input : this.inputs.values()) {
       input.update();
       
+      // Find out which cursor type to display depending on what the user is hovering their cursor over
       if (input.isVisible && input.isHovered) {
         currentCursor = input.getCursorType();
       }

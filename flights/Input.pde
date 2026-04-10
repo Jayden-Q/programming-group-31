@@ -116,16 +116,19 @@ class Input {
     this.callback = callback;
   }
 
+  // Called when a user event occurs (clicking, draggin, typing, etc.)
   void triggerCallback() {
     if (this.callback != null && this.isVisible) {
       this.callback.call();
     }
   }
 
+  // What the cursor should look like when the user hovers/focuses/etc. on this Input
   int getCursorType() {
     return ARROW;
   }
 
+  // Always check if the user is hovering over this Input
   void update() {
     this.isHovered = isMouseHovering() && this.isVisible;
   }
@@ -220,13 +223,9 @@ class Slider extends Input {
   void update() {
     super.update();
 
-    //if (this.isHovered) {
-    //  cursor(HAND);
-    //}
-
     // Dragging logic
     if (this.isDragging) {
-      float t = constrain((mouseX - this.x) / this.w, 0, 1); // Normalize mouse position (0 <-> 1)
+      float t = constrain((mouseX - this.x) / this.w, 0, 1); // Normalize mouse position to a value between 0 and 1
       this.value = lerp(this.minV, this.maxV, t);
       this.triggerCallback();
     }
@@ -270,17 +269,20 @@ class RangeSlider extends Slider {
   RangeSlider(float x, float y, float w, float h, String label, float minV, float maxV) {
     super(x, y, w, h, label, minV, maxV);
 
+    // Default values for both handles
     this.lowValue = minV + (maxV - minV) * 0.25;
     this.highValue = minV + (maxV - minV) * 0.75;
   }
 
+  // Convert value to an x screen position
   float valueToX(float v) {
-    float t = (v - minV) / (maxV - minV);
+    float t = (v - minV) / (maxV - minV); // Normalize
     return x + t * w;
   }
 
+  // Convert x screen position to a value
   float xToValue(float mx) {
-    float t = constrain((mx - x) / w, 0, 1);
+    float t = constrain((mx - x) / w, 0, 1); // Normalize
     return lerp(minV, maxV, t);
   }
 
@@ -309,7 +311,10 @@ class RangeSlider extends Slider {
     boolean overLow = dist(mouseX, mouseY, lowX, cy) <= r;
     boolean overHigh = dist(mouseX, mouseY, highX, cy) <= r;
 
+    // Failsafe in case mouse overlaps both handles
     if (overLow && overHigh) {
+      
+      // Pick the closest handle
       if (abs(mouseX - lowX) <= abs(mouseX - highX)) {
         draggingLow = true;
       } else {
@@ -322,8 +327,10 @@ class RangeSlider extends Slider {
     } else if (overHigh) {
       draggingHigh = true;
       isActive = true;
-    } else if (isMouseHovering()) {
+    } else if (isMouseHovering()) { // If clicked somewhere on the slider track
       float mouseValue = xToValue(mouseX);
+      
+      // Move closest handle to the click position
       if (abs(mouseValue - lowValue) <= abs(mouseValue - highValue)) {
         lowValue = constrain(mouseValue, minV, highValue);
         draggingLow = true;
@@ -358,10 +365,6 @@ class RangeSlider extends Slider {
     boolean overHigh = dist(mouseX, mouseY, highX, cy) <= r;
 
     this.isHovered = (overLow || overHigh || draggingLow || draggingHigh || this.isMouseHovering()) && this.isVisible;
-
-    //if (this.isHovered) {
-    //  cursor(HAND);
-    //}
 
     if (draggingLow) {
       float mouseValue = xToValue(mouseX);
@@ -412,15 +415,16 @@ class RangeSlider extends Slider {
 ///////////////Dropdown///////////////
 //////////////////////////////////////
 class Dropdown extends Input {
+  // List of selectable options
   String[] options;
   int selectedIndex = 0;
 
   boolean isOpen = false;
 
-  int maxVisibleItems = 5;
+  int maxVisibleItems = 5; // Max number of items displayed on list before scrolling
   int scrollOffset = 0;
 
-  float itemHeight;
+  float itemHeight; // Height of each item in dropdown list
 
   Dropdown(float x, float y, float w, float h, String label, String[] options, int defaultIndex) {
     super(x, y, w, h, label);
@@ -570,10 +574,6 @@ class Dropdown extends Input {
 
   void update() {
     this.isHovered = (isOverClosedBox() || (this.isOpen && isOverList())) && this.isVisible;
-
-    //if (this.isHovered) {
-    //  cursor(HAND);
-    //}
   }
   
   int getCursorType() {
