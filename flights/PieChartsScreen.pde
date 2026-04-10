@@ -1,4 +1,5 @@
 // 24/03/26: Jayden, Pie Charts Screen
+ //02/04/2026 Xianren - added initial skeleton functions to handle switching screens 
 class PieChartsScreen {
   LinkedHashMap<String, PieChart> pieCharts = new LinkedHashMap<String, PieChart>();
   LinkedHashMap<String, Input> inputs = new LinkedHashMap<String, Input>();
@@ -288,7 +289,6 @@ class PieChartsScreen {
     cursor(currentCursor);
   }
     
-  //02/04/2026 Xianren - added missing function (keyPressed) to handle switching screens
   // EVENTS
   void keyPressed() {}
   
