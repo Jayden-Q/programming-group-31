@@ -1,4 +1,5 @@
 //02/04/2026 Xianren - navbutton class for single button creation
+//02/04/2026 Xianren - navgation class for multiple buttons (adding and updating)
 // Navigation button class
 class NavButton {
   //variables
