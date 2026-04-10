@@ -1,3 +1,5 @@
+//02/04/2026 Xianren - changes in relation to screen switching feature
+//02/04/2026 Xianren - attempted a dataset changing feature(discarded)
 import java.util.*;
 import processing.event.*;
 Table table, table2, table3, table4;
@@ -19,6 +21,7 @@ PFont widgetFont;
 
 Flights flightsData;
 
+//02/04/2026 Xianren - changes in relation to screen switching feature
 // Screens
 PieChartsScreen pieChartsScreen;
 SearchScreen searchScreen;
@@ -48,7 +51,8 @@ void setup() {
   pieChartsScreen = new PieChartsScreen(flightsData);
   searchScreen = new SearchScreen(flightsData);
   barChartsScreen = new BarChartsScreen(flightsData);
-  
+
+  //02/04/2026 Xianren - changes in relation to screen switching feature
   // Initialize navigation
   nav = new Navigation(50, 20, 120, 40);
   nav.addButton("Pie Chart", 0);
@@ -109,7 +113,8 @@ void draw() {
     default:
       searchScreen.draw();
   }
-  
+
+  //02/04/2026 Xianren - changes in relation to screen switching feature
   // Update and draw button
   nav.update();
   nav.draw();
@@ -118,6 +123,7 @@ void draw() {
 //  datasetDropdown.draw();
 }
 
+//02/04/2026 Xianren - changes in relation to screen switching feature
 void keyPressed() {
   // Pass key press to active screen
   if (screenToRenderIndex == 0) {
@@ -136,6 +142,7 @@ void keyReleased() {
   }
 }
 
+//02/04/2026 Xianren - changes in relation to screen switching feature
 void mousePressed() {
   // Check navigation buttons first
   int newScreen = nav.checkClick();
@@ -145,7 +152,8 @@ void mousePressed() {
   }
   
   //datasetDropdown.mousePressed();
-  
+
+  //02/04/2026 Xianren - changes in relation to screen switching feature
   // Pass mouse press to active screen
   if (screenToRenderIndex == 0) {
     pieChartsScreen.mousePressed();
@@ -154,7 +162,8 @@ void mousePressed() {
   } else if (screenToRenderIndex == 2) {
     barChartsScreen.mousePressed();
   }
-  
+
+  //02/04/2026 Xianren - attempted a dataset changing feature(discarded)
   if (key == 'z' || key == 'Z') {
          flightsData = new Flights(table);
   } else if (key == 'x' || key == 'X') {
@@ -164,7 +173,8 @@ void mousePressed() {
 
 void mouseReleased() {
   //datasetDropdown.mouseReleased();
-  
+
+  //02/04/2026 Xianren - changes in relation to screen switching feature
   // Pass mouse release to active screen
   if (screenToRenderIndex == 0) {
     pieChartsScreen.mouseReleased();
@@ -173,6 +183,7 @@ void mouseReleased() {
   }
 }
 
+//02/04/2026 Xianren - changes in relation to screen switching feature
 void mouseWheel(MouseEvent event) {
   // Pass mouse wheel to screens that need it
   if (screenToRenderIndex == 0) {
