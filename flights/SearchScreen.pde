@@ -1,4 +1,8 @@
 //12/03/2026 Xianren - SearchScreen class
+//12/03/2026 Abdul, scroll
+//19/03/2026: Xianren - bar chart
+//26/03/2026 Xianren - added citySearch for text input
+//02/04/2026 Xianren - modified for real time graph update (same approach as search)
 class SearchScreen {
   float scrollY = 0;
   float targetScroll = 0;
