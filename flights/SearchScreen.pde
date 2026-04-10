@@ -1,3 +1,4 @@
+//12/03/2026 Xianren - SearchScreen class
 class SearchScreen {
   float scrollY = 0;
   float targetScroll = 0;
@@ -121,7 +122,8 @@ class SearchScreen {
     textAlign(LEFT);
     drawCarrierChart();
   }
-  
+
+  //02/04/2026 Xianren - modified for real time graph update (same as search)
   // Draw bar chart with filters (textInput)
   void drawCarrierChart() {
     // Get filter value
@@ -215,7 +217,8 @@ class SearchScreen {
       }
     }
   }
-  
+
+  //26/03/2026 Xianren - mousePressed function for entering search box
   void mousePressed() {
     citySearch.mousePressed();
   }
