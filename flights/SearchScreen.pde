@@ -61,6 +61,7 @@ class SearchScreen {
       boolean matches = true;
         
       // City filter (searches both origin and destination)
+      // checks if search box contains city names
       if (!searchCity.equals("")) {
         if (!f.ORIGIN_CITY_NAME.toLowerCase().contains(searchCity.toLowerCase()) &&
             !f.DEST_CITY_NAME.toLowerCase().contains(searchCity.toLowerCase())) {
@@ -93,14 +94,14 @@ class SearchScreen {
       }
         
       text(f.ORIGIN_CITY_NAME + " → " + f.DEST_CITY_NAME + " (" + f.MKT_CARRIER + f.MKT_CARRIER_FL_NUM + ")", 50, y);
-      //Distance
+      //Displaying Distance
       String distanceText = f.DISTANCE + " miles"; 
       text(distanceText, 350, y);
     }
       
     popMatrix();
       
-    // Info
+    //Displaying Info
     fill(100);
     text("Total flights: " + flightsData.flights.size() + " | Showing: " + filteredFlights.size() + 
          " matching | Rows " + startRow  + " to " + endRow, 350, 100);
@@ -123,7 +124,7 @@ class SearchScreen {
     drawCarrierChart();
   }
 
-  //02/04/2026 Xianren - modified for real time graph update (same as search)
+  //02/04/2026 Xianren - modified for real time graph update (same approach as search)
   // Draw bar chart with filters (textInput)
   void drawCarrierChart() {
     // Get filter value
@@ -136,13 +137,15 @@ class SearchScreen {
       boolean matches = true;
       
       // City filter
+      // check if search box contains city name
       if (!searchCity.equals("")) {
         if (!f.ORIGIN_CITY_NAME.toLowerCase().contains(searchCity.toLowerCase()) &&
             !f.DEST_CITY_NAME.toLowerCase().contains(searchCity.toLowerCase())) {
           matches = false;
         }
       }
-      
+
+      // add count if matches
       if (matches) {
         String carrier = f.MKT_CARRIER;
         if (carrierCounts.containsKey(carrier)) {
@@ -152,7 +155,8 @@ class SearchScreen {
         }
       }
     }
-    
+
+    //Display message when no matches found
     int numCarriers = carrierCounts.size();
     if (numCarriers == 0) {
       fill(0);
@@ -168,7 +172,8 @@ class SearchScreen {
         maxCount = count;
       }
     }
-    
+
+    // chart variables
     int index = 0;
     for (String carrier : carrierCounts.keySet()) {
       int count = carrierCounts.get(carrier);
@@ -197,8 +202,10 @@ class SearchScreen {
   
   void keyPressed() {
     // Handle input field
+    // Adds pressed key to search box and more
     citySearch.keyPressed(key);
-    
+
+    //scroll
     if (key == CODED) {
       if (keyCode == UP) {
         upPressed = true;
