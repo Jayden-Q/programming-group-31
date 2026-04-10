@@ -1,3 +1,5 @@
+//02/04/2026 Xianren - added initial skeleton functions for screen switch feature
+//02/04/2026 Xianren - removed background in draw function to make sure only one screen shows up at a time
 //abdul barchart screen (full)
 class BarChartsScreen {
   

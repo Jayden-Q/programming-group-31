@@ -1,4 +1,5 @@
 // 24/03/26: Jayden, Input, Slider, RangeSlider
+//26/03/2026 Xianren - text input extension for input and exiting the search box
 class Input {
   static final int TYPE_STRING = 0;
   static final int TYPE_INT = 1;

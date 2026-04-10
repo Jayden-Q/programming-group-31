@@ -280,8 +280,7 @@ class PieChartsScreen {
     
     cursor(currentCursor);
   }
-    
-  // EVENTS  
+  
   void mousePressed() {
     for (Input input : this.inputs.values()) {
       input.mousePressed();

@@ -1,6 +1,8 @@
 //02/04/2026 Xianren - navbutton class for single button creation
+//02/04/2026 Xianren - navgation class for multiple buttons (adding and updating)
 // Navigation button class
 class NavButton {
+  //variables
   float x, y, w, h;          
   String label;               
   int targetScreen;           
@@ -65,6 +67,7 @@ class NavButton {
 //02/04/2026 Xianren - navgation class for multiple buttons (adding and updating)
 //all buttons and screen switching
 class Navigation {
+  //variables
   ArrayList<NavButton> buttons;  
   int currentScreen;             
   float buttonY;                
@@ -76,7 +79,7 @@ class Navigation {
   Navigation(float startX, float buttonY, int buttonWidth, int buttonHeight) {
     this.startX = startX;
     this.buttons = new ArrayList<NavButton>();
-    this.currentScreen = 0;      // Start with search city screen (1)
+    this.currentScreen = 0;      // Start with pie charts screen (0)
     this.buttonY = buttonY;
     this.buttonWidth = buttonWidth;
     this.buttonHeight = buttonHeight;
