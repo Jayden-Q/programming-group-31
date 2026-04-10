@@ -1,4 +1,4 @@
-//02/04/2026 Xianren - button classes for changing screens
+//02/04/2026 Xianren - navbutton class for single button creation
 // Navigation button class
 class NavButton {
   float x, y, w, h;          
@@ -62,6 +62,7 @@ class NavButton {
   }
 }
 
+//02/04/2026 Xianren - navgation class for multiple buttons (adding and updating)
 //all buttons and screen switching
 class Navigation {
   ArrayList<NavButton> buttons;  
