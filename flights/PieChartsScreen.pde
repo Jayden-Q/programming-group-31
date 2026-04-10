@@ -81,27 +81,7 @@ class PieChartsScreen {
       }
     });
     
-    //////////////    
-    // Dropdown //
-    //////////////
-    //String[] airports = {
-    //  "origin",
-    //  "destination",
-    //};
-    
-    String[] carriers = flightsData.getFlightCarriers(flightsData.flights);
-    
-    //Dropdown carrierDropdown = new Dropdown(900, 400, 220, 30, "Carrier", carriers, 0);
-    //carrierDropdown.setMaxVisibleItems(3);
-    
-    //carrierDropdown.onChange(new Callback() {
-    //  @Override
-    //  public void call() {
-    //    updateCharts();
-    //  }
-    //});
-    
-    
+    String[] carriers = flightsData.getFlightCarriers(flightsData.flights);    
     MultiSelectDropdown carrierDropdown = new MultiSelectDropdown(950, 400, 220, 30, "Carriers", carriers);
     carrierDropdown.setMaxVisibleItems(5);
     
@@ -137,23 +117,6 @@ class PieChartsScreen {
     this.pieCharts.put(name, chart);
     return chart;
   }
-  
-  //void changeDataset(Flights flightsData) {
-  //  this.flightsData = flightsData;
-    
-  //  Slider airportsToShowSlider = (Slider) this.inputs.get("airportsToShowSlider");
-  //  RangeSlider distanceSlider = (RangeSlider) this.inputs.get("distanceSlider");
-    
-  //  // Update min/max values for max sections slider
-  //  airportsToShowSlider.setMinValue(1);
-  //  airportsToShowSlider.setMaxValue(flightsData.flights.size());
-    
-  //  // Update min/max values for distance slider
-  //  distanceSlider.setMinValue(flightsData.getMinDistance(flightsData.flights));
-  //  distanceSlider.setMaxValue(flightsData.getMaxDistance(flightsData.flights));
-    
-  //  updateCharts();
-  //}
   
   void updateCharts() {
     Slider airportsToShowSlider = (Slider) this.inputs.get("airportsToShowSlider");
@@ -288,10 +251,7 @@ class PieChartsScreen {
     cursor(currentCursor);
   }
     
-  //02/04/2026 Xianren - added missing function (keyPressed) to handle switching screens
-  // EVENTS
-  void keyPressed() {}
-  
+  // EVENTS  
   void mousePressed() {
     for (Input input : this.inputs.values()) {
       input.mousePressed();

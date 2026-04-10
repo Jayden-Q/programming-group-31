@@ -5,17 +5,8 @@ Table table, table2, table3, table4;
 // Navigation object
 Navigation nav;
 
-// Dropdown for selecting dataset
-Dropdown datasetDropdown;
-
 // Base font
 PFont widgetFont;
-
-// Management class for flights
-//Flights flightsData2k;
-//Flights flightsData10k;
-//Flights flightsData100k;
-//Flights flightsDataAll;
 
 Flights flightsData;
 
@@ -38,9 +29,6 @@ void setup() {
   
   // Load CSV file
   table = loadTable("flights2k.csv", "header");
-  //table2 = loadTable("flights10k.csv", "header");
-  //table3 = loadTable("flights100k.csv", "header");
-  //table4 = loadTable("flights_full.csv", "header");
 
   flightsData = new Flights(table);
   
@@ -54,38 +42,6 @@ void setup() {
   nav.addButton("Pie Chart", 0);
   nav.addButton("Search city", 1);
   nav.addButton("Bar Chart", 2);
-  
-  // Initialize dataset dropdown
-  //String[] datasetOptions = {
-  //  "2k",
-  //  "10k",
-  //  "100k",
-  //  "all"
-  //};
-  //datasetDropdown = new Dropdown(width - 250, 40, 200, 40, "Dataset", datasetOptions, 0);
-  //datasetDropdown.setMaxVisibleItems(2);
-  
-  //datasetDropdown.onChange(new Callback() {
-  //  @Override
-  //  void call() {
-  //    switch ((String) datasetDropdown.value) {
-  //      case "2k":
-  //        selectedDataset = flightsData2k;
-  //        pieChartsScreen.changeDataset(selectedDataset);
-  //        break;
-  //      case "10k":
-  //        selectedDataset = flightsData10k;
-  //        pieChartsScreen.changeDataset(selectedDataset);
-  //        break;
-  //      case "100k":
-  //        selectedDataset = flightsData100k;
-  //        break;
-  //      case "all":
-  //        selectedDataset = flightsData100k;
-  //        break;
-  //    }
-  //  }
-  //});
 }
 
 void draw() {
@@ -113,15 +69,11 @@ void draw() {
   // Update and draw button
   nav.update();
   nav.draw();
-  
-//  datasetDropdown.update();
-//  datasetDropdown.draw();
 }
 
 void keyPressed() {
   // Pass key press to active screen
   if (screenToRenderIndex == 0) {
-    pieChartsScreen.keyPressed();
   } else if (screenToRenderIndex == 1) {
     searchScreen.keyPressed();
   } else if (screenToRenderIndex == 2) {
@@ -144,8 +96,6 @@ void mousePressed() {
     return;
   }
   
-  //datasetDropdown.mousePressed();
-  
   // Pass mouse press to active screen
   if (screenToRenderIndex == 0) {
     pieChartsScreen.mousePressed();
@@ -163,8 +113,6 @@ void mousePressed() {
 }
 
 void mouseReleased() {
-  //datasetDropdown.mouseReleased();
-  
   // Pass mouse release to active screen
   if (screenToRenderIndex == 0) {
     pieChartsScreen.mouseReleased();
@@ -180,6 +128,4 @@ void mouseWheel(MouseEvent event) {
   } else if (screenToRenderIndex == 2) {
     barChartsScreen.mouseWheel(event);
   }
-  
-  //datasetDropdown.mouseWheel(event.getCount());
 }
