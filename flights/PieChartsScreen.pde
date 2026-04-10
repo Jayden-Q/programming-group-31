@@ -288,7 +288,7 @@ class PieChartsScreen {
     cursor(currentCursor);
   }
     
-  
+  //02/04/2026 Xianren - added missing function (keyPressed) to handle switching screens
   // EVENTS
   void keyPressed() {}
   
