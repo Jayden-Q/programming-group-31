@@ -336,7 +336,7 @@ class BarChartsScreen {
     topN = constrain(topN, 1, 10);
   }
  
- //palceholder
+ //02/04/2026 Xianren - added required functions for screen switch feature
  void keyPressed() { } 
  void mouseWheel(MouseEvent event) { } 
 }
