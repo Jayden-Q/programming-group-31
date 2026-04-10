@@ -3,6 +3,7 @@
 //19/03/2026: Xianren - bar chart
 //26/03/2026 Xianren - added citySearch for text input
 //02/04/2026 Xianren - modified for real time graph update (same approach as search)
+//02/04/2026 Xianren - removed background in draw function to make sure only one screen shows up at a time
 class SearchScreen {
   float scrollY = 0;
   float targetScroll = 0;
